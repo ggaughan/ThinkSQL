@@ -1,0 +1,106 @@
+ThinkSQL Linux Release 1.03
+===========================
+
+Installation:
+Create a backup copy of any existing db1.dat sample catalog file.
+
+Extract the files from the archive, e.g.
+
+  tar -xzvf thinkSQLlinux.tar.gz
+
+To use the dbExpress driver with Kylix, move the dbExpress driver,
+libsqlthink.so.0, into the kylix/bin directory.
+
+
+Server
+------
+The server can be started from the command line, e.g.
+
+	 ./ThinkSQL
+	 
+(Obviously an optional '&' can be added to send the process into the
+background.)
+
+Note: you must start the server process in the directory containing the 
+primary catalog (e.g. db1.dat) and thinkSQL.lic files.
+
+
+Clients
+-------
+Telnet (echo on):
+The following command will open a connection to the server
+(on the same machine):
+
+	telnet localhost 9075
+	
+Press <return> to get the ThinkSQL Welcome prompt.
+Type:
+
+	connect to 'thinksql' user 'restaurant';
+	
+to connect to the sample restaurant schema, otherwise the first command will
+automatically connect as 'default'.
+See the User Guide for more details and remember to end each command 
+with a semi-colon (;) (or a full-stop (.) on a line of its own if the
+command contains a block of statements, e.g. create function).
+
+
+ISQLraw:
+This program requires the Qt 2.2.4 libraries.
+If Kylix is installed, issuing:
+
+	source <KYLIXPATH>/bin/kylixpath
+	
+will make these libraries available (replace <KYLIXPATH> with the path to
+the Kylix directory).
+
+Alternatively, download the thinkSQLlinuxQt.tar.gz file from
+http://www.thinksql.co.uk and extract this into the same directory as the
+ISQLraw program. Running:
+
+	./startISQLraw
+	
+will then start the client using the local shared libraries.
+Select Connection|Connect to connect to the server.
+
+
+dbExpress (API for Kylix):
+Make sure the 'libsqlthink.so.0' file has been moved into the 
+Kylix 'bin' directory.
+Edit the 'dbxdrivers' file which is found in the Kylix user's home directory
+in a hidden folder name '.borland'. Add the following line to the
+[Installed Drivers] section:
+	THINKSQL=1
+	
+And add the following section to the file to describe the new driver:
+	[THINKSQL]
+	GetDriverFunc=getSQLDriverTHINKSQL
+	LibraryName=libsqlthink.so.0
+	VendorLib=libsqlthink.so.0
+	BlobSize=-1
+	Database=thinksql
+	HostName=localhost
+	Password=
+	User_Name=DEFAULT
+
+Add the following section to the dbxconnections file (in the same directory)
+to describe a default connection:
+	[ThinkSQL]
+	BlobSize=-1
+	Database=thinksql
+	DriverName=THINKSQL
+	HostName=localhost
+	Password=
+	User_Name=DEFAULT
+
+These two files are used by Kylix to set default parameters for the driver.
+They are not needed for deployment. See the Kylix help for more details.
+
+The dbExpress driver should now be available to use from Kylix.
+
+
+JDBC:
+See the User Guide file for details.
+
+Python DB-API module:
+See the separate README included with this interface.

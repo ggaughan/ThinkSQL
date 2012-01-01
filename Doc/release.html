@@ -1,0 +1,120 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>ThinkSQL RDBMS</title>
+</head>
+
+<body>
+
+<p align="center"><font size="5" face="Verdana"><b>ThinkSQL&#153; RDBMS</b></font></p>
+
+<p align="center">&nbsp;</p>
+
+<p align="center"><font size="4" face="Verdana"><b>Release Notes</b></font></p>
+
+<p align="center"><font size="2" face="Verdana"><i>13th September 2004</i></font></p>
+
+<p>&nbsp;</p>
+
+<p><font face="Verdana"><b>Version 01.04.00</b></font></p>
+
+<p><strong><font size="2" face="Verdana">Fixes</font></strong></p>
+
+<p><font size="2" face="Verdana">Fixed WITH RETURN cursors.</font></p>
+
+<p><font size="2" face="Verdana">Fixed CAST from timestamp to char.</font></p>
+
+<p><font size="2" face="Verdana">Fix variable reference scope problem within cursors.</font></p>
+
+<p><font size="2" face="Verdana">JDBC database metadata getTypeInfo returns DATA_TYPE.</font></p>
+
+<p><font size="2" face="Verdana">CREATE INDEX (undocumented) is no longer ignored.</font></p>
+
+<p><font size="2" face="Verdana">&nbsp;</font></p>
+
+<p><font size="2" face="Verdana"><strong>Enhancements</strong></font></p>
+
+<p><font size="2" face="Verdana">Added JDBC SetObject method.</font></p>
+
+<p><font size="2" face="Verdana">Added DEBUG PRINT <scalar-expression> statement to ease routine debugging.</font></p>
+
+<p><font size="2" face="Verdana">&nbsp;</font></p>
+
+<p><font face="Verdana"><b>Version 01.03.00</b></font></p>
+
+<p><strong><font size="2" face="Verdana">Fixes</font></strong></p>
+
+<p><font size="2" face="Verdana">Fixed bug with routines partially executing IF/ELSE/CASE
+compound statements.</font></p>
+
+<p><font size="2" face="Verdana">ODBC SQLDriverConnect returns output string.</font></p>
+
+<p><font size="2" face="Verdana">JDBC getObject returns correct day for timestamps.</font></p>
+
+<p><font size="2" face="Verdana">&nbsp;</font></p>
+
+<p><font size="2" face="Verdana"><strong>Enhancements</strong></font></p>
+
+<p><font size="2" face="Verdana">Added Python DB-API driver (see ThinkSQLPython-1.03.zip).</font></p>
+
+<p><font size="2" face="Verdana">Allow routines to be up to 2M in size (for new catalogs).</font></p>
+
+<p><font size="2" face="Verdana">&nbsp;</font></p>
+
+<p><font face="Verdana"><b>Version 01.02.00</b></font></p>
+
+<p><strong><font size="2" face="Verdana">Fixes</font></strong></p>
+
+<p><font size="2" face="Verdana">Improved reporting of function result types during
+statement preparation.</font></p>
+
+<p><font size="2" face="Verdana">dbExpress now passes transaction isolation level to
+server.</font></p>
+
+<p><font size="2" face="Verdana">JDBC fixes include:</font> 
+
+<ul>
+  <li><font size="2" face="Verdana">parameter fix</font></li>
+  <li><font size="2" face="Verdana">speed increase for getImported(Exported)Keys</font></li>
+  <li><font size="2" face="Verdana">fix for missing column_def in getColumns</font></li>
+  <li><font size="2" face="Verdana">throw exception for unimplemented options</font></li>
+  <li><font size="2" face="Verdana">fix for
+    getBestRowIndentifier/getVersionColumns/getProcedureColumns</font></li>
+</ul>
+
+<p>&nbsp;</p>
+
+<p><font face="Verdana"><b>Version 01.01.00</b></font></p>
+
+<p><strong><font size="2" face="Verdana">Fixes</font></strong></p>
+
+<p><font size="2" face="Verdana">Dropped and recreated sequences in a single server
+session now clear any remaining cached values.</font></p>
+
+<p><font size="2" face="Verdana">dbExpress, ODBC and JDBC driver metadata for numeric
+column precision is now reported correctly.</font></p>
+
+<p><font size="2" face="Verdana">dbExpress TSQLconnection.StartTransaction now temporarily
+disables autocommit until Commit or Rollback.</font></p>
+
+<p><font size="2" face="Verdana">JDBC fixes include:</font> 
+
+<ul>
+  <li><font size="2" face="Verdana">exception reporting improved</font></li>
+  <li><font size="2" face="Verdana">autocommit is now on by default</font></li>
+  <li><font size="2" face="Verdana">fix for empty string results (was returning null
+    character)</font></li>
+  <li><font size="2" face="Verdana">getColumns returns java.sql.Types (rather than ODBC types)</font></li>
+  <li><font size="2" face="Verdana">information_schema views are now reported via getTables as
+    System Tables (previously they were only reported if connected as information_schema)</font></li>
+  <li><font size="2" face="Verdana">metadata fix for getColumn nullable/is_nullable columns</font></li>
+</ul>
+
+<p>&nbsp;</p>
+
+<p><font face="Verdana"><b>Version 01.00.00</b></font></p>
+
+<p><font size="2" face="Verdana">Initial release.</font></p>
+</body>
+</html>
