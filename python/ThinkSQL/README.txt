@@ -1,6 +1,6 @@
 A Pure Python DB-API 2.0 compliant interface to ThinkSQL
 
-  (c)Copyright 2004 ThinkSQL Ltd. All rights reserved.
+            Copyright © 2000-2012  Greg Gaughan
 
                http://www.thinksql.co.uk
 ========================================================

@@ -1,6 +1,6 @@
 '''A Pure Python DB-API 2.0 compliant interface to ThinkSQL.
 
-   (c)Copyright 2004 ThinkSQL Ltd. All rights reserved.
+            Copyright © 2000-2012  Greg Gaughan
 
    http://www.thinksql.co.uk
 '''
@@ -24,8 +24,8 @@ threadsafety=1
 
 paramstyle='qmark'
 
-__copyright__ = "(c)Copyright 2004 ThinkSQL Ltd. All rights reserved."
-__author__ = "ThinkSQL Ltd"
+__copyright__ = "(c)Copyright 2000-2012 Greg Gaughan"
+__author__ = "Greg Gaughan"
 
 def connect(dsn=None, user=None, password=None, host=None,
             database=None, port=None):

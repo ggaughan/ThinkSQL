@@ -422,7 +422,7 @@ const
   Title='ThinkSQL Relational Database Management System';
   Version='01.04.00';
   VersionNumber=104; //100 = 1.00 used for licence checking
-  Copyright='Copyright © 2000-2004 ThinkSQL Ltd';
+  Copyright='Copyright © 2000-2012 Greg Gaughan';
 
   serverName='THINKSQL'; //also used surfaced in sysServer table 
 

@@ -70,11 +70,11 @@ DLL=0
 Locale=2057
 CodePage=1252
 [Version Info Keys]
-CompanyName=ThinkSQL Ltd
+CompanyName=Greg Gaughan
 FileDescription=
 FileVersion=0.5.3.11
 InternalName=
-LegalCopyright=Copyright © 2000-2003 ThinkSQL Ltd
+LegalCopyright=Copyright © 2000-2012 Greg Gaughan
 LegalTrademarks=
 OriginalFilename=
 ProductName=ThinkSQL Relational Database Management System
