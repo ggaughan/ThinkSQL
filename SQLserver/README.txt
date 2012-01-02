@@ -11,6 +11,7 @@ build, although conversion to Lazarus should be straightforward.
 It requires:
 	Indy (v9) TCP/IP networking components
 	DCPcrypt (v2) encryption routines
+	Lex and Yacc - for modifying the parser
 
 All source code is written by Greg Gaughan, except:
 	MultiMM - Robert Lee
