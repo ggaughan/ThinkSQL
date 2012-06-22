@@ -13,7 +13,7 @@ threads, causing and needing deep psychological flow.
 The code comments are released as-is, and are often streams-of-consciousness.
 
 
-Database drivers, test cases and tools will be released later.
+Test cases and tools will be released later.
 
 See the LICENCE.txt files for licensing details.
 
