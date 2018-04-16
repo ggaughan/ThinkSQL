@@ -1,4 +1,4 @@
-unit uParser;
+﻿unit uParser;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -41,6 +41,9 @@ var
 
 
 implementation
+uses
+  uEvsHelpers
+  ,lexlib,yacclib;//moved here from sql.pas because d2007 deadlocks it self.
 
 {$INCLUDE SQL}        //this includes the yacc/lex parser engine
                       //built from sqllex.l and sql.y

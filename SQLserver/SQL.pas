@@ -1,4 +1,4 @@
-
+﻿
 (* Yacc parser template (TP Yacc V3.0), V1.2 6-17-91 AG *)
 
 (* global definitions: *)
@@ -12,7 +12,7 @@
 
 //{$define yydebug}  //debug to console
 
-uses lexlib,yacclib;
+//uses lexlib,yacclib; moved to uparser to avoid dead locking the IDE. 
 
 type YYSType = TSyntaxNodePtr;  //override Yacc default type of integer
 

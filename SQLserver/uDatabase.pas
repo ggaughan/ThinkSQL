@@ -1,4 +1,4 @@
-unit uDatabase;
+﻿unit uDatabase;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -25,7 +25,9 @@ unit uDatabase;
 
 interface
 
-uses uGlobal, SyncObjs {for Critcal Sections}, sysutils, classes {for TBits}, IdTCPConnection{debug only}, uStmt;
+uses
+  uGlobal, SyncObjs {for Critcal Sections}, sysutils, classes {for TBits}, IdTCPConnection{debug only}, uStmt
+  ,uEvsHelpers;
 
 type
   TdbHeader=record //db header page data layout
@@ -6514,36 +6516,31 @@ begin
       readAhead:=nextNode.next; //in case this node is removed from the list, e.g. via disconnectFromDB
                                 //note: assumes list remains stable when a node is removed=bad!
 
-      with (nextNode.tran as TTransaction) do
-      begin
+      with (nextNode.tran as TTransaction) do begin
         {Kill the garbage collector's controlling thread}
         if nextNode.tran<>tr then
-          if thread<>nil then
-            if thread is TGarbageCollector then
-            begin
+          if thread<>nil then    //JKOZ:001: Move to the garbage collector class
+            if thread is TGarbageCollector then begin
               {$IFDEF DEBUG_LOG}
               log.add((tr as TTransaction).sysStmt.who,where+routine,format('Forceably terminating tran %d from tranlist: [%s]',[longint(nextNode.tran),(nextNode.tran as TTransaction).sysStmt.who]),vDebugLow);
               {$ENDIF}
               //Note: after terminating, calls gcOnTerminate only when main thread closes = too late
               //      (because onTerminate is executed in main VCL thread & it is suspended)
-              if not thread.suspended then
-              begin
-                thread.Terminate;
+              if not TGarbageCollector(Thread).suspended then begin
+                TGarbageCollector(Thread).Terminate;
                 sleepOS(WAITFOR_GC_TERMINATE); //wait for garbage collector to finish off
                 //note: waitFor is too dangerous? should be ok...
               end;
 
               //              thread.WaitFor; //hang until the thread wakes up and finishes
-            end
-            else
-            begin
-              {$IFDEF DEBUG_LOG}
+            end else begin  //JKOZ:001:End here
+              {$IFDEF DEBUG_LOG}   //JKOZ:Q: so if thread = nil then no cancel or disconnectFromDB?
               log.add((tr as TTransaction).sysStmt.who,where+routine,format('Forceably cancelling and rolling back tran %d from tranlist: [%s]',[longint(nextNode.tran),(nextNode.tran as TTransaction).sysStmt.who]),vDebugLow);
               {$ENDIF}
-              cancel(nil,nil);
-              disconnect; //Note: does a rollback
+              Cancel(nil,nil);
+              Disconnect; //Note: does a rollback
               //todo db:=nil !
-              disconnectFromDB;
+              DisconnectFromDB;
             end;
       end;
 
@@ -6571,16 +6568,12 @@ begin
   tranlistCS.BeginRead;
   try
     nextNode:=tranList;
-    if nextNode=nil then
-    begin
+    if nextNode=nil then begin
       result:='<none>';
-    end
-    else
-      while nextNode<>nil do
-      begin
+    end else
+      while nextNode<>nil do begin
         //todo: note in future, Rt.tranId could be user's 'kill' reference/handle...
-        with (nextNode.tran as TTransaction) do
-        begin
+        with (nextNode.tran as TTransaction) do begin
           case isolation of
             isSerializable:    isolationDesc:='Serializable';
             isReadCommitted:   isolationDesc:='Read committed';
@@ -6591,14 +6584,14 @@ begin
             isolationDesc:='?';
           end; {case}
           {$IFDEF DEBUG_LOG}
-          result:=result+format('%-*.*s %30.30s %s',[32,32,authName,who,isolationDesc])+CRLF;
+          Result:=Result+Format('%-*.*s %30.30s %s',[32,32,authName,who,isolationDesc])+CRLF;
           {$ELSE}
-          result:=result+format('%-*.*s %21.21s %s',[32,32,authName,who,isolationDesc])+CRLF;
+          Result:=Result+Format('%-*.*s %21.21s %s',[32,32,authName,who,isolationDesc])+CRLF;
           {$ENDIF}
 
           //todo list stmts and their current status?
           {$IFDEF DEBUG_LOG}
-          result:=result+showStmts;
+          Result:=Result+showStmts;
           {$ENDIF}
         end;
 

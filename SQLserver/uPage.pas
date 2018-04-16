@@ -1,4 +1,4 @@
-unit uPage;
+﻿unit uPage;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -45,7 +45,8 @@ unit uPage;
 interface
 
 uses uGlobal, uStmt, sysutils,
-     IdTCPConnection{debug only};
+     IdTCPConnection{debug only}
+     ,uEvsHelpers;
 
 const
   //InvalidPageId:pageId=$FFFFFFFF; //i.e. maxCardinal(32-bit) //old:-1; (*$7FFFFFFE; {while still crippled in catalog}*)
@@ -124,10 +125,10 @@ var
 
   debugLatchCount:int64; //cardinal;
   //todo we should keep count of number of contentions
-
 implementation
 
-uses uLog; //todo remove
+uses uLog
+     ; //todo remove
 
 const
   where='uPage';

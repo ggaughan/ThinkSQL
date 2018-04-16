@@ -1,4 +1,4 @@
-unit uTransaction;
+﻿unit uTransaction;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -45,16 +45,28 @@ unit uTransaction;
    tr   = transaction reference of callers of lower level (sub)routines
 }
 
+{  JKOZ :001: problem with encapsulation.
+               A worker should not reference directly an initiator only through established mechanisms and
+               initiator on the other hand can reference and monitor and manage a worker.
+               A Worker inform any one registered for updates for its status as he sees fit.
+                 That might time intervals or when a change in status occures.
+               in short a transaction should not have any access to the thread that initiated but
+               the thread can register an event to get inform when the transaction fails or succeds
+               with its task.
+               The same goes for the task managed by the transaction they should only care who to update.
+}
+
 {$DEFINE DEBUGDETAIL}
 {$DEFINE DEBUGDETAIL2}  //stmt level sub-transactioning
 {$DEFINE DEBUGDETAIL3}  //trace tran/stmt memory allocation
+{$DEFINE INDY10}  //trace tran/stmt memory allocation
 
 interface
 
 uses uGlobalDef, uGlobal, IdTCPConnection{only for showtrans diags for monitor & kill},
      uSyntax {for parseRoot}, uDatabase, uConstraint,
      uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
-     classes {for TThread}, sysutils, uStmt
+     classes {for TThread}, sysutils, uStmt, uEvsHelpers
      ;
 
 type
@@ -77,10 +89,13 @@ type
   TTransaction=class
     private
       fdb:Tdb;                //database for current connection
-
+    {$IFDEF INDY9}
       fThread:TThread;        //controlling thread reference (from this we could get the network connection!)
                               //nil = db creation or main thread
-
+    {$ENDIF}
+    {$IFDEF INDY10}
+      fThread:TObject;//TIdPeerThread;
+    {$ENDIF}
       {Note: we use read/write timestamps to allow partial transaction rollbacks:
          Rt.stmtId is the latest successful insert/update/delete statement written (initially 0)
          Wt.stmtId is used to write changes at least 1 ahead of the read-ability (initially 0)
@@ -90,7 +105,7 @@ type
                 Wt.stmtId is used (only!) to track the last used stmtId
                 the Tstmt.Rt.stmtId is now used to check visibility
       }
-      fRt:StampId; //default read-as timestamp for stmts 
+      fRt:StampId; //default read-as timestamp for stmts
       fWt:StampId; //next write-as timestamp (used to write optimistically and atomically)
 
       fAuthId:TAuthID;        //=user
@@ -148,8 +163,12 @@ type
       rolledBackStmtList:TstmtStatusPtr; //Pointer to any rolled-back stmts => on commit, this will be tsPartRolledBack
 
       property db:Tdb read fdb;
-
-      property thread:TThread read fThread write fThread;
+      {$IFDEF INDY9}
+      property Thread:TThread read fThread write fThread;
+      {$ENDIF}
+      {$IFDEF INDY10}
+       property Thread:TObject read fThread write fThread;
+      {$ENDIF}
 
       //todo protect writes via Set routines
       //note: use stmt level versions: 26/03/02
@@ -473,7 +492,7 @@ function TTransaction.Who:string;
 begin
   {$IFDEF DEBUG_LOG}
   if thread<>nil then
-    result:=format('%8.8x)%10.10d:%10.10d',[thread.ThreadId,fRt.tranId,fRt.stmtId])
+    result:=format('%8.8x)%10.10d:%10.10d',[thread.ThreadId,fRt.tranId,fRt.stmtId]) //jkoz002:use currenthreadid instead to decouple the connection.
   else
   {$ENDIF}
     result:=format('%10.10d:%10.10d',[fRt.tranId,{n/a? we're tran-level:}fRt.stmtId]);
@@ -3156,24 +3175,29 @@ begin
   {Now rollback the whole transaction}
   saveTranId:=tranRt.TranId;
   {$IFDEF DEBUG_LOG}
-  log.add(who,where+routine,format('Forceably rolling back tran %d',[tranRt.tranId]),vDebugLow); 
+  log.add(who,where+routine,format('Forceably rolling back tran %d',[tranRt.tranId]),vDebugLow);
   {$ENDIF}
   rollback(False); //todo return fail if this fails?
   //todo db:=nil !
 
   {Now disconnect it}
-  if thread<>nil then
+  if thread<>nil then  //JKOZ:001 : Move to the appropriate class this I'm guessing the thread class
     if thread is TCMThread then //e.g. not garbage collector
     begin
       (thread as TCMThread).connection.Disconnect; //this will terminate the thread //todo: disconnectSocket is more powerful?
       try //in case disconnect didn't work
         sleepOS(100);
+      {$IFDEF INDY9}
         (thread as TCMThread).connection.DisconnectSocket;
+      {$ENDIF}
+      {$IFDEF INDY10}
+        (thread as TCMThread).connection.Disconnect;
+      {$ENDIF}
       except
         {ok}
       end; {try}
       //todo? (thread as TCMThread).Terminate;
-    end;
+    end;  //JKOZ:001 : ends here.
 
   if connection<>nil then connection.WriteLn(format('Killed transaction %d',[saveTranId]));
 end; {Kill}

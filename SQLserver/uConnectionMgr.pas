@@ -1,68 +1,92 @@
-unit uConnectionMgr;
+﻿unit uConnectionMgr;
 
 {       ThinkSQL Relational Database Management System
-              Copyright © 2000-2012  Greg Gaughan
+              Copyright Â© 2000-2012  Greg Gaughan
                   See LICENCE.txt for details
 }
 
 //{$DEFINE DEBUGDETAIL}  //affects monitor output detail
 {$DEFINE DEBUGCOLUMNDETAIL_BLOB} //debug blob detail & allocation counts (from uTuple)
 
-{$IFDEF LINUX}
-  {$DEFINE INDY8}       //use old Indy: problem with shutdown - extra thread restarts/stop forever!
+{$IFDEF FPC}
+  {$DEFINE INDY10}
+{$ELSE}
+  {$DEFINE INDY10}
+  {.$DEFINE INDY9}
 {$ENDIF}
+
+//{$IFDEF LINUX}
+//  {$DEFINE INDY8}       //use old Indy: problem with shutdown - extra thread restarts/stop forever!
+//{$ENDIF}
 
 interface
 
 uses uGlobal, uServer, uTransaction, uMarshal, uStmt, SyncObjs{for TEvent},
-     IdBaseComponent, IdComponent, IdTCPServer, IdThread,
-     uGlobalDef{for Tblob};
+     IdBaseComponent, IdComponent, IdTCPServer, IdThread, IdObjs, IdTCPConnection, IdYarn,
+     uGlobalDef{for Tblob}
+   {$IFDEF INDY10}
+     ,IdContext
+   {$ENDIF}     
+     ,uEvsHelpers;
 
 type
+
   TConnectionMgr=class
-    private
-      dbserver:TDBserver;       //used to pass to each thread for transaction creation
-                                //- in future could have multiple servers per process?
-    public
-      ss:TIdTCPServer;
+  private
+    dbserver:TDBserver;       //used to pass to each thread for transaction creation
+                              //- in future could have multiple servers per process?
+  public
+    ss:TEvsTCPServer;
 
-      cmShutdown:TEvent;
+    cmShutdown:TEvent;
 
-      constructor Create(dbs:TDBServer);
-      destructor Destroy; override;
+    constructor Create(dbs:TDBServer);
+    destructor Destroy; override;
 
-      function Start(use_port:string):integer;
-      function Stop:integer;
+    function Start(use_port:string):integer;
+    function Stop:integer;
 
-      procedure ssOnConnect(AThread: TIdPeerThread); //note: type=TIdServerThreadEvent?
+    {$IFDEF INDY9}
+    procedure ssOnConnect(aThread: TIdPeerThread); //note: type=TIdServerThreadEvent?
+    {$endif}
+    {$IFDEF INDY10}
+      procedure ssOnConnect(aThread: TIdContext); //note: type=TIdServerThreadEvent?
+    {$endif}
   end; {TConnectionMgr}
 
   TclientType=(ctUnknown,ctDumb,ctCLI);
   TCMthread=class(TIdPeerThread)
-    {This represents a 'connection'}
-    private
-      manager:TConnectionMgr; //used to signal server/cm shutdown
+  {This represents a 'connection'}
+  private
+    manager:TConnectionMgr; //used to signal server/cm shutdown
 
-      function getIP:string;
-    public
-      dbserver:TDBserver;    //- in future could have multiple servers per process?
+    function getIP:string;
+  protected
+    {$IFDEF INDY10}
+    function Run:Boolean; override;
+    {$ENDIF}
+  public
+    dbserver:TDBserver;    //- in future could have multiple servers per process?
 
-      tr:TTransaction;       //the current connection/session
-      marshal:TMarshalBuffer;
-      marshalColumnNumber:SQLSMALLINT;      //note partially retrieved column for SQLgetData chunking
-      marshalColumnBlobData:Tblob;          //partially retrieved column blob data for SQLgetData chunking
-      marshalColumnBlobDataOffset:cardinal; //latest position in (partially) retrieved column blob data for SQLgetData chunking
-      sHandle:Tstmt; //direct temporary stmt for ctDumb
+    tr:TTransaction;       //the current connection/session
+    marshal:TMarshalBuffer;
+    marshalColumnNumber:SQLSMALLINT;      //note partially retrieved column for SQLgetData chunking
+    marshalColumnBlobData:Tblob;          //partially retrieved column blob data for SQLgetData chunking
+    marshalColumnBlobDataOffset:cardinal; //latest position in (partially) retrieved column blob data for SQLgetData chunking
+    sHandle:Tstmt; //direct temporary stmt for ctDumb
 
-      clientType:TclientType; //after initial CLI handshake, all other communication is assumed CLI, else raw/dumb
-      clientCLIversion:word;  //store the client's driver version for protocol matching
-      clientCLItype:word;     //store the client's driver type: CLI_ODBC, CLI_JDBC, CLI_DBEXPRESS, CLI_ADO_NET
+    clientType:TclientType; //after initial CLI handshake, all other communication is assumed CLI, else raw/dumb
+    clientCLIversion:word;  //store the client's driver version for protocol matching
+    clientCLItype:word;     //store the client's driver type: CLI_ODBC, CLI_JDBC, CLI_DBEXPRESS, CLI_ADO_NET
 
-      property IP:string read getIP;
+    property IP:string read getIP;
 
-      constructor Create(ACreateSuspended:Boolean); override;
-      destructor Destroy; override;
-      procedure Run; override;
+     {$IFDEF INDY9}  constructor Create(ACreateSuspended:Boolean); override; {$endif}
+     {$IFDEF INdY10} constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil); override; {$endif}
+    destructor Destroy; override;
+    {$IFDEF INDY9}
+    procedure Run;override;
+    {$endif}
   end; {TCMthread}
 
 implementation
@@ -107,12 +131,19 @@ constructor TConnectionMgr.Create(dbs:TDBserver);
 begin
   cmShutdown:=TEvent.Create(nil,False,False,'');
   dbserver:=dbs;
-  ss:=TIdTCPServer.Create(nil); //todo handle exception: maybe no TCP/IP stack installed
-  ss.OnConnect:=ssOnConnect;
+  //JKOZ : Replaced the tcp server with a custom one.
+  ss:=TEvsTCPServer.Create(nil); //todo handle exception: maybe no TCP/IP stack installed
+//  {$IFDEF INDY9}
+//    ss.OnConnect:=ssOnConnectOld;
+//  {$endif}
+  {.$IFDEF INDY10}
+    ss.OnConnect:=ssOnConnect;
+  {.$endif}
+
 end; {Create}
 
 destructor TConnectionMgr.Destroy;
-const routine=':destroy'; 
+const routine=':destroy';
 begin
   if ss.Active then
   begin
@@ -224,8 +255,14 @@ begin
 end; {stop}
 
 
-procedure TConnectionMgr.ssOnConnect(AThread: TIdPeerThread);
-const routine=':ssOnConnect'; 
+{$IFDEF INDY9}
+procedure TConnectionMgr.ssOnConnect(aThread: TIdPeerThread); //note: type=TIdServerThreadEvent?
+{$endif}
+{$IFDEF INDY10}
+procedure TConnectionMgr.ssOnConnect(aThread: TIdContext); //note: type=TIdServerThreadEvent?
+{$endif}
+const
+  routine=':ssOnConnect';
 begin
   (AThread as TCMThread).dbserver:=self.dbserver;
   {$IFDEF DEBUG_LOG}
@@ -246,9 +283,14 @@ begin
   (AThread as TCMThread).Manager:=self;
 end;
 
+{$IFDEF INDY10}
+constructor TCMthread.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil);
+{$endif}
+{$IFDEF INDY9}
 constructor TCMthread.Create(ACreateSuspended:Boolean);
+{$endif}
 begin
-  inherited Create(ACreateSuspended);
+  inherited Create({$IFDEF INDY10}AConnection, AYarn, AList{$ENDIF}{$IFDEF INDY9}ACreateSuspended{$ENDIF});
   //create transaction for this connection
   begin
     tr:=TTransaction.Create;
@@ -338,7 +380,12 @@ begin
     result:='';
 end; {getIP}
 
+{$IFDEF INDY9}
 procedure TCMthread.Run;
+{$ENDIF}
+{$IFDEF INDY10}
+function TCMthread.Run:Boolean;
+{$ENDIF}
 const routine=':Run';
 type
   dumbMode=(dmNormal,dmCreate,dmBlock);
@@ -359,6 +406,9 @@ var
   saveAuthName:string;
   resultRowCount:integer;
 begin
+  {$IFDEF INDY10}
+  Result := False;
+  {$ENDIF}
   {Wait for handshake to determine client type/version}
   clientType:=ctDumb; //assume dumb client
   try
@@ -393,9 +443,16 @@ begin
       Connection.WriteLn(sql+CRLF);
     end;
   except
-    //todo return error code/reason?
+    {$IFDEF INDY9}
     Connection.DisconnectSocket;
-    Terminate;
+    Terminate; // a bit redundant? exit will take care of the the termination
+    {$ENDIF}
+    {$IFDEF INDY10}
+    Connection.Disconnect;
+    {$ENDIF}
+    {$IFDEF INDY10}
+    Result := False;
+    {$ENDIF}
     exit;
   end; {try}
 
@@ -490,11 +547,9 @@ begin
 
       {Process the next command}
       begin
-        if clientType=ctCLI then
-        begin
+        if clientType=ctCLI then begin
           {Pass the client's command to the server-side CLI routines}
-          if marshal.getFunction(FunctionId)=ok then
-          begin
+          if marshal.getFunction(FunctionId)=ok then begin
             case FunctionId of
               SQL_API_handshake:                res:=handshake(self); //todo remove: not expected!
 
@@ -530,8 +585,7 @@ begin
             end; {case}
             //todo check res (maybe clear marshalbuffer if not ok?)
             // - may be that user will timeout or error because of this error...re-synchronise?
-            if res<>ok then //todo log marshalbuffer state also
-            begin
+            if res<>ok then begin//todo log marshalbuffer state also
               {$IFDEF DEBUG_LOG}
               log.add(tr.sysStmt.who,where+routine,format('function id %d failed with result %d',[functionId,res]),vDebugError);
               {$ENDIF}
@@ -547,8 +601,7 @@ begin
               {Now send the client an invalid function response to cause it to generate a connection error}
               marshal.clearToSend;
               marshal.putFunction(SQL_API_exception); //Note: we ignore the result - may not work here...
-              if marshal.Send<>ok then
-              begin
+              if marshal.Send<>ok then begin
                 {$IFDEF DEBUG_LOG}
                 log.add(tr.sysStmt.who,where+routine,format('Error sending error response',[nil]),vDebugMedium);
                 {$ENDIF}
@@ -558,9 +611,8 @@ begin
             end;
           end;
           //else //todo error!
-        end
-        else //ctDumb
-        begin
+        end else begin//ctDumb
+
           {$IFDEF DEBUG_LOG}
           {$IFDEF DEBUGDETAIL}
           log.add(st.who,where+routine,format('Treating as raw SQL text: %s',[sql]),vDebugLow);
@@ -569,8 +621,7 @@ begin
 
           if sHandle=nil then //allocate a temporary statement (used to use sysStmt but was tripping over self!)
             if tr.addStmt(stUser{implicit},sHandle)=ok then
-            else
-            begin
+            else begin
               {$IFDEF DEBUG_LOG}
               log.add(tr.sysStmt.who,where+routine,'failed allocating temporary stmt handle, continuing...',vAssertion);
               {$ENDIF}
@@ -593,19 +644,17 @@ begin
                 try
                   with (tr.db.owner as TDBserver).dbList.locklist do
                     //newDB:=(Ttransaction(stmt.owner).db.owner as TDBserver).findDB(stmt.sroot.leftChild.idVal); //assumes we're already connected to a db
-                    for i:=0 to count-1 do
-                    begin
+                    for i:=0 to count-1 do begin
                       {
                       if TDB(Items[i])=initialDB then
                         connection.Writeln(' *'+TDB(Items[i]).dbName)
                       else
                       }
-                      if Items[i]<>nil then
-                      begin
+                      if Items[i]<>nil then begin
                         connection.Writeln('Catalog '+TDB(Items[i]).dbName+':');
                         Connection.WriteLn(TDB(Items[i]).ShowTransactions);
                       end;
-                  end;
+                    end;
                 finally
                   (tr.db.owner as TDBserver).dbList.unlockList;
                 end {try}
@@ -614,29 +663,26 @@ begin
             finally
               tr.authName:=saveAuthName; //restore
             end; {try}
-          end
-          else
-              begin
-                {$IFDEF DEBUG_LOG}
-                log.add(tr.sysStmt.who,where+routine,format('Handle=%d SQL=%s',[handle,sql]),vDebugMedium);
-                {$ENDIF}
-                if uParser.ExecSQL(sHandle,sql,Connection,resultRowCount)=-999 then
-                begin //shutdown system //note: debug method only...
-                  {$IFDEF DEBUG_LOG}
-                  log.add(tr.sysStmt.who,where+routine,format('Server requested to shutdown by transaction %s',[tr.sysStmt.who]),vDebugMedium);
-                  {$ENDIF}
-                  //todo send client 'shutting down server' confirmation message
+          end else begin
+            {$IFDEF DEBUG_LOG}
+            log.add(tr.sysStmt.who,where+routine,format('Handle=%d SQL=%s',[handle,sql]),vDebugMedium);
+            {$ENDIF}
+            if uParser.ExecSQL(sHandle,sql,Connection,resultRowCount)=-999 then begin //shutdown system //note: debug method only...
+              {$IFDEF DEBUG_LOG}
+              log.add(tr.sysStmt.who,where+routine,format('Server requested to shutdown by transaction %s',[tr.sysStmt.who]),vDebugMedium);
+              {$ENDIF}
+              //todo send client 'shutting down server' confirmation message
 
-                  //todo: db.removeTransaction for all current
+              //todo: db.removeTransaction for all current
 
-                  {Kill self}
-                  Connection.Disconnect;
-                  {pass shutdown signal to main caller to close system}
-                  if manager<>nil then manager.cmShutdown.SetEvent;
-                  //todo else assertion!
-                  Terminate;
-                end;
-              end;
+              {Kill self}
+              Connection.Disconnect;
+              {pass shutdown signal to main caller to close system}
+              if manager<>nil then manager.cmShutdown.SetEvent;
+              //todo else assertion!
+              Terminate;
+            end;
+          end;
           {any other code here should be thread-safe
            e.g. use PostMessage etc.
           }
@@ -694,7 +740,11 @@ begin
       end;
     end;
   end; {try}
+  {$IFDEF INDY10} //this is the last line of execution what was the task it was apparently finished properly.
+  Result := True;
+  {$ENDIF}
 end; {ClientExecute}
 
 
 end.
+

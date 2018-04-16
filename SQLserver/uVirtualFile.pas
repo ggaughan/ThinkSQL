@@ -1,4 +1,4 @@
-unit uVirtualFile;
+﻿unit uVirtualFile;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -69,11 +69,13 @@ type
 
 implementation
 
-uses uLog, sysUtils, uServer,
-     uBuffer{for stats}, uSyntax{for debug status}, uTransaction,
-     uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for sqltimestamp},
-     classes {for PPointerList}, Math {for power}
-;
+uses
+  uLog, sysUtils, uServer,
+  uBuffer{for stats}, uSyntax{for debug status}, uTransaction,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for sqltimestamp},
+  classes {for PPointerList}, Math {for power}
+ ,uEvsHelpers
+     ;
 
 const
   where='uVirtualFile';

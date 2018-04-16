@@ -13,13 +13,8 @@ program ThinkSQL;
 {$ENDIF}
 
 uses
-  {$IFDEF USE_MULTIMM}  //Note: ensure this doesn't get lost when we add new units!
   MultiMM in 'MultiMM.pas',
   HPMM in 'HPMM.pas',
-  {$ENDIF}
-  {$IFDEF USE_APPLICATION}
-  Forms,
-  {$ENDIF}
   uLog in 'uLog.pas',
   uPage in 'uPage.pas',
   uGlobal in 'uGlobal.pas',
@@ -69,7 +64,10 @@ uses
   uVariableSet in 'uVariableSet.pas',
   uIterInto in 'uIterInto.pas',
   uTempTape in 'uTempTape.pas',
-  uDatabaseMaint in 'uDatabaseMaint.pas';
+  uDatabaseMaint in 'uDatabaseMaint.pas',
+  uMarshalGlobal in '..\Odbc\uMarshalGlobal.pas',
+  uMarshal in '..\Odbc\uMarshal.pas',
+  uEvsHelpers in 'uEvsHelpers.pas';
 
 {$IFDEF WIN32}
 {$R *.RES}
