@@ -1,0 +1,7 @@
+{$IFDEF MultiMM}
+  MultiMM,
+  HpMM,
+{$ENDIF}
+{$IFDEF Debug_Log}
+  uLog in 'uLog.pas',
+{$ENDIF}

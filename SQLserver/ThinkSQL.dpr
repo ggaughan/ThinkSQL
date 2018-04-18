@@ -4,18 +4,10 @@ program ThinkSQL;
               Copyright © 2000-2012  Greg Gaughan
                   See LICENCE.txt for details
 }
-
-{$IFDEF WIN32}
-  //{$DEFINE USE_APPLICATION} //Windows application.processMessages to prevent other apps. hanging (also in uMain)
-  {$IFNDEF DEBUG_LOG} //use Delphi MM for development testing
-    {$DEFINE USE_MULTIMM}     //Use Windows non-Borland memory manager (MultiMM)
-  {$ENDIF}
-{$ENDIF}
-
+{$I Defs.inc}
+{.$I Optional.use} // this include must be in the uses clause bellow. Adding and removing files from the project deletes it.
 uses
-  MultiMM in 'MultiMM.pas',
-  HPMM in 'HPMM.pas',
-  uLog in 'uLog.pas',
+  {$I Optional.use}
   uPage in 'uPage.pas',
   uGlobal in 'uGlobal.pas',
   uDatabase in 'uDatabase.pas',

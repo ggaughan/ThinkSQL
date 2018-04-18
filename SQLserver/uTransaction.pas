@@ -492,7 +492,7 @@ function TTransaction.Who:string;
 begin
   {$IFDEF DEBUG_LOG}
   if thread<>nil then
-    result:=format('%8.8x)%10.10d:%10.10d',[thread.ThreadId,fRt.tranId,fRt.stmtId]) //jkoz002:use currenthreadid instead to decouple the connection.
+    result:=format('%8.8x)%10.10d:%10.10d',[TIDPeerThread(thread).ThreadId,fRt.tranId,fRt.stmtId]) //jkoz002:use currenthreadid instead to decouple the connection.
   else
   {$ENDIF}
     result:=format('%10.10d:%10.10d',[fRt.tranId,{n/a? we're tran-level:}fRt.stmtId]);

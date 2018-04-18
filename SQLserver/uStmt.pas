@@ -1,4 +1,4 @@
-unit uStmt;
+﻿unit uStmt;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -210,7 +210,7 @@ var
 implementation
 
 uses uLog, sysUtils{for format}, uConstraint, uTransaction,
-     uProcessor{for unpreparePlan}, uIterator{for unpreparePlan};
+     uProcessor{for unpreparePlan}, uIterator{for unpreparePlan}, uEvsHelpers;
 
 const
   where='uStmt';
@@ -747,7 +747,7 @@ begin
   if owner=nil then result:=cursorName
   else
     if Ttransaction(owner).thread<>nil then
-      result:=format('%8.8x)%10.10d:%10.10d %s %s',[Ttransaction(owner).thread.ThreadId,fRt.tranId,fRt.stmtId,cursorName,fwhoLabel(sroot)])
+      result:=format('%8.8x)%10.10d:%10.10d %s %s',[TIDPeerThread(Ttransaction(owner).Thread).ThreadId,fRt.tranId,fRt.stmtId,cursorName,fwhoLabel(sroot)])
     else
     {$ENDIF}
       result:=format('%10.10d:%10.10d',[fRt.tranId,fRt.stmtId]);

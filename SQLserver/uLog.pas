@@ -1,4 +1,4 @@
-unit uLog;
+﻿unit uLog;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -12,11 +12,7 @@ unit uLog;
    This will make it a serious bottleneck - remove (switch off) when timing/live
 }
 
-{$IFDEF DEBUG_LOG}
-  {$DEFINE LOG}
-{$ENDIF}
-
-{$DEFINE FLUSH_AFTER_EVERY_LOG} //must turn off!
+{$I Defs.inc}
 
 interface
 
@@ -30,8 +26,8 @@ type
 
   TLog=class
   private
-    logF:text;
     Fverbosity:vbType;
+    logF:text;
     csLog:TcriticalSection;
     constructor Create(fname:string);
     destructor Destroy; override;
@@ -95,7 +91,9 @@ const
 var
 //todo these should be part of class so they're thread safe!
   hs:THeapStatus;
+{.$IFDEF Debug_Log}
   startAlloc, endAlloc, startFree, endFree:integer;
+{.$ENDIF}
   countDebugErr,countDebugWarning,countErr,countFix,countAssertion,countWarning:integer;
 
 constructor TLog.Create(fname:string);
@@ -107,7 +105,7 @@ begin
   countFix:=0;
   countAssertion:=0;
   countWarning:=0;
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   csLog:=TCriticalSection.Create;
   assignFile(logF,fname);
   rewrite(logF);
@@ -116,22 +114,22 @@ begin
   writeln(logF,Copyright);
   writeln(logF,'Version '+uGlobal.Version);
   writeln(logF);
-  {$ENDIF}
+  {.$ENDIF}
 end;
 
 destructor TLog.Destroy;
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   writeln(logF,'Log file closed: '+formatDateTime('c',now));
   closeFile(logF);
   csLog.Free;
-  {$ENDIF}
+  {.$ENDIF}
   inherited;
 end;
 
 procedure TLog.start;
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   writeln(logF,'Log started: '+formatDateTime('c',now));
   status;
   startAlloc:=hs.totalAllocated; startFree:=hs.TotalFree;
@@ -139,7 +137,7 @@ begin
   writeln(logF,format('Block size=%d',[blocksize]));
   writeln(logF,format('Slot size=%d',[slotSize]));
   writeln(logF,format('Buffer pool=%d',[maxFrames]));
-  {$ENDIF}
+  {.$ENDIF}
 end;
 
 procedure TLog.Status;
@@ -147,19 +145,19 @@ procedure TLog.Status;
 var
   h,m,s,ms:word;
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   {$IFDEF WIN32}
   hs:=GetHeapStatus;  //todo use uOS for Linux...
   {$ENDIF}
   decodeTime(now,h,m,s,ms);
   add(who,format('%2.2d:%2.2d:%2.2d:%2.2d',[h,m,s,ms])+'  Heap memory',format('total available=%d (committed=%d, uncommitted=%d) overhead=%d',[hs.TotalAddrSpace,hs.totalCommitted,hs.totalUncommitted,hs.Overhead]),vDebug);
   add(who,format('%2.2d:%2.2d:%2.2d:%2.2d',[h,m,s,ms])+'  Free memory',format('allocated=%d, free=%d (unused=%d, freebig=%d, freesmall=%d)',[hs.totalAllocated,hs.TotalFree,hs.Unused,hs.freeBig,hs.freeSmall]),vDebug);
-  {$ENDIF}
+  {.$ENDIF}
 end;
 
 procedure TLog.stop;
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   //todo give error summary
   //     maybe always set logOn...?
   status;
@@ -175,12 +173,12 @@ begin
   add(who,'','',vDebug);
   writeln(logF,'Log stopped: '+formatDateTime('c',now));
   writeln(logF);
-  {$ENDIF}
+  {.$ENDIF}
 end;
 
 procedure TLog.add(const who:string;const where:string;ms:string;mt:vbType);
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   if mt>=Fverbosity then
   begin
     if LogOn then
@@ -216,30 +214,30 @@ begin
   if mt=vAssertion then inc(countAssertion);
   if mt=vWarning then inc(countWarning);
 
-  {$ENDIF}
+  {.$ENDIF}
 end;
 
 procedure TLog.quick(s:string);
 {Quick debug log}
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   add(who,'quick',s,vDebug);
-  {$ENDIF}
+  {.$ENDIF}
 end; {quick}
 
 procedure TLog.LogFlush;
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   flush(logF);
-  {$ENDIF}
+  {.$ENDIF}
 end; {flush}
 
 procedure TLog.Hold;
 const routine=':Hold';
 begin
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   add(who,where+routine,'Hold...',vDebug);
-  {$ENDIF}
+  {.$ENDIF}
   logOn:=False;
 end; {hold}
 
@@ -247,9 +245,9 @@ procedure TLog.Resume;
 const routine=':Resume';
 begin
   logOn:=True;
-  {$IFDEF LOG}
+  {.$IFDEF LOG}
   add(who,where+routine,'...Resume',vDebug);
-  {$ENDIF}
+  {.$ENDIF}
 end; {resume}
 
 initialization

@@ -190,7 +190,7 @@ begin
   {$IFNDEF LINUX}
   ss.ReuseSocket:=rsTrue; //try to prevent port already in use after some crashes
   {$ENDIF}
-  ss.DefaultPort:=strToIntDef(use_port,TCPport); //default to fixed port number
+  ss.DefaultPort := strToIntDef(use_port, TCPport); //default to fixed port number
 
   //ss.Bindings.Add;
   //ss.Bindings.Items[0].Port := TCPport; //fix for 9.03 beta?

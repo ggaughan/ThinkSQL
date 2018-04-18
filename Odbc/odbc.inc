@@ -1,4 +1,4 @@
-{       ThinkSQL Relational Database Management System
+﻿{       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
                   See LICENCE.txt for details
 }

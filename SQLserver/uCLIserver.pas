@@ -1,10 +1,12 @@
-unit uCLIserver;
+﻿unit uCLIserver;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
                   See LICENCE.txt for details
 }
-
+{$I Defs.inc}
+{$IFDEF Debug_Log} {$Undef Debug_Log} {$ENDIF}
+{.$DEFINE DEBUG_LOG}
 {$DEFINE DEBUGDETAIL}
 {$DEFINE DEBUGDETAIL2}  //show client SQL
 

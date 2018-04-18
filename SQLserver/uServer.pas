@@ -13,6 +13,10 @@
    without it, DB(s) would talk directly to BufMgr - better?
 }
 
+{$I Defs.inc}
+{$IFDEF Debug_Log} {$Undef Debug_Log} {$ENDIF}
+{.$DEFINE DEBUG_LOG}
+
 interface
 
 uses uGlobal, uBuffer, uDatabase, Classes {for TList},
