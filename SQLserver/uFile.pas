@@ -1,4 +1,4 @@
-unit uFile;
+﻿unit uFile;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -202,7 +202,10 @@ var
 
 implementation
 
-uses uLog, sysUtils, uServer, uTransaction, uOS {for sleep};
+uses
+  uLog, sysUtils, uServer, uTransaction, uOS {for sleep}
+  ,uEvsHelpers
+  ;
 
 const
   where='uFile';

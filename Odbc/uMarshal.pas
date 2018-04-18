@@ -1,4 +1,4 @@
-{$IFNDEF DBEXP_STATIC}
+﻿{$IFNDEF DBEXP_STATIC}
 unit uMarshal;
 
 {       ThinkSQL Relational Database Management System
@@ -7,7 +7,7 @@ unit uMarshal;
 }
 
 //{$DEFINE DEBUG_DETAIL}
-//{$DEFINE DEBUG_DETAIL2} //bytes sent (only useful for server build!) 
+//{$DEFINE DEBUG_DETAIL2} //bytes sent (only useful for server build!)
 
 {This is the marshal/unmarshal (put/get) buffer class.
  It passes packed, buffered parameters over the transport layer
@@ -145,13 +145,13 @@ var
 {$IFNDEF DBEXP_STATIC}
 implementation
 
-uses uGlobal, sysUtils {for debug intToStr only}
+uses IdGlobal, uGlobal, sysUtils {for debug intToStr only}
 {$IFDEF DEBUG_DETAIL}
 {$IFDEF DEBUG_LOG}
 ,uLog
 {$ENDIF}
 {$ENDIF}
-;
+,uEvsHelpers;
 
 {$ENDIF}
 
@@ -166,6 +166,8 @@ uses uGlobal, sysUtils {for debug intToStr only}
 }
 
 constructor TMarshalBuffer.Create(cs:TIdTCPConnection);
+var
+  vt:TBytes;
 begin
   clientSocket:=cs;
   communication_timeout:=$FFFFFFFF; //todo maximum = timeout 0 to SQL
@@ -1659,6 +1661,7 @@ end; {putpDataSDWORD}
 
 
 {$IFNDEF DBEXP_STATIC}
+
 end.
 {$ENDIF}
 

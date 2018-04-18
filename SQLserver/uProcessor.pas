@@ -1,4 +1,4 @@
-unit uProcessor;
+﻿unit uProcessor;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -84,6 +84,7 @@ uses uLog, SysUtils, uRelation, uServer,
  uDatabaseMaint, uPage{debug only}
  ,uConnectionMgr{for access to TCMthread for shutdown check},
  uGarbage
+ ,uEvsHelpers
  ;
 
 const

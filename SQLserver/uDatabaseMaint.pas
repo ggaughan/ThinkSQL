@@ -1,4 +1,4 @@
-unit uDatabaseMaint;
+﻿unit uDatabaseMaint;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -19,7 +19,7 @@ uses uLog,SysUtils,uServer,uDatabase,uTransaction,
      uOS, uGlobalDef, classes{for TList}, uParser,
      uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
      uProcessor     
-     ;
+     ,uEvsHelpers;
 
 const where='uDatabaseMaint';
 

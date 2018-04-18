@@ -1,4 +1,4 @@
-unit uServer;
+﻿unit uServer;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -12,6 +12,10 @@ unit uServer;
    actually links buffer manager and database(s)
    without it, DB(s) would talk directly to BufMgr - better?
 }
+
+{$I Defs.inc}
+{$IFDEF Debug_Log} {$Undef Debug_Log} {$ENDIF}
+{.$DEFINE DEBUG_LOG}
 
 interface
 
@@ -91,7 +95,7 @@ type
 const
   //BAD_LICENSEE='?';
   //BAD_MAXCONNECTIONS=1;
-  //BAD_EXPIRY=0; 
+  //BAD_EXPIRY=0;
 
   Key:array [0..9] of char=(#165,#183,#159,#19,#04,#51,#144,#117,#90,#75);
 
@@ -108,7 +112,9 @@ implementation
 
 uses uLog, {for coCreateGuid+inttohex ActiveX,} sysUtils,
      uTransaction, {for getConnectionCount}
-     DCPtwofish, DCPsha1;
+     DCPtwofish, DCPsha1
+     ,uEvsHelpers
+     ;
 
 const
   where='uServer';
@@ -141,12 +147,12 @@ begin
 
    Since this is a fairly empty unit so far, we include the license code in it...
   }
-  if readLicence(cardinal(self))<>cardinal(self){todo check against time} then
-  begin
-    Flicence.licensee:='?';
-    Flicence.maxConnections:=strtoint(format('%d',[-1]));
+//  if readLicence(cardinal(self))<>cardinal(self){todo check against time} then
+//  begin
+//    Flicence.licensee:='?';
+//    Flicence.maxConnections:=strtoint(format('%d',[-1]));
     //Flicence.expiry:=0;
-  end;
+//  end;
 
   buffer:=TBufMgr.create;
 
@@ -356,8 +362,7 @@ begin
       end;
       try
         blockread(FlicenceFile,licenceVersion,sizeof(licenceVersion)); //unencrypted
-        if licenceVersion>=1 then
-        begin
+        if licenceVersion>=1 then begin
           blockread(FlicenceFile,Flicence,sizeof(Flicence));
           dcp.decrypt(Flicence,Flicence,sizeof(Flicence));
         end; //1
@@ -509,6 +514,5 @@ begin
     connection.Writeln;
   end;
 end; {debugDump}
-
 
 end.

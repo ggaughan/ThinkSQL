@@ -1,4 +1,4 @@
-unit uMain;
+﻿unit uMain;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -9,15 +9,8 @@ unit uMain;
  could make use of the embedded SQL engine, but became the server's main loop
 }
 
-//{$DEFINE NO_GARBAGE_COLLECTOR}    //debug
-                                    //Note: Garbage Collect Catalog is still available anyway!
 
-{$IFDEF WIN32}
-  //{$DEFINE USE_APPLICATION} //Windows application.processMessages to prevent other apps. hanging (also in DPR)
-  {$IFNDEF USE_APPLICATION}
-    {$DEFINE USE_PROCESS_MESSAGES} //Non-Forms Windows message handler
-  {$ENDIF}
-{$ENDIF}
+{$I Defs.inc}
 
 interface
 
@@ -26,7 +19,11 @@ procedure Main;
 
 implementation
 
-uses uLog, uServer, uGlobal, uConnectionMgr,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}
+  uServer, uGlobal, uConnectionMgr,
   uOS,
   {$IFDEF WIN32} //todo move to uOS
   Windows,{for getWorkingsetSize}
