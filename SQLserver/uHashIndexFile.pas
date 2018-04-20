@@ -126,7 +126,10 @@ type
 implementation
 
 uses
-  uLog, SysUtils, Math {for power}, uServer, uTransaction,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils, Math {for power}, uServer, uTransaction,
   uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures}
   ,uEvsHelpers;
 

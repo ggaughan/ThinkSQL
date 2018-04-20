@@ -91,7 +91,11 @@ type
 
 implementation
 
-uses sysUtils, ulog, uParser,
+uses sysUtils,
+{$IFDEF Debug_Log}
+  ulog,
+{$ENDIF}  
+  uParser,
      {$IFDEF WIN32} //move to uOS
      Windows{for thread timing},
      {$ENDIF}

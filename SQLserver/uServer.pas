@@ -110,11 +110,15 @@ function calculateChecksum(d:pchar;s:cardinal):cardinal;
 
 implementation
 
-uses uLog, {for coCreateGuid+inttohex ActiveX,} sysUtils,
-     uTransaction, {for getConnectionCount}
-     DCPtwofish, DCPsha1
-     ,uEvsHelpers
-     ;
+uses
+{$IFDEF Debug_LOg}
+  uLog, {for coCreateGuid+inttohex ActiveX,}
+{$ENDIF}  
+  sysUtils,
+  uTransaction, {for getConnectionCount}
+  DCPtwofish, DCPsha1
+  ,uEvsHelpers
+  ;
 
 const
   where='uServer';

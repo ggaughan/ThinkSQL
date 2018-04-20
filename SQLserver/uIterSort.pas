@@ -1,4 +1,4 @@
-unit uIterSort;
+﻿unit uIterSort;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -113,7 +113,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uEvalCondExpr, uHeapFile, uMarshalGlobal;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uEvalCondExpr, uHeapFile, uMarshalGlobal;
 
 const
   where='uIterSort';

@@ -1,4 +1,4 @@
-unit uOptimiser;
+﻿unit uOptimiser;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -33,7 +33,10 @@ uses uGlobal, uTransaction, uIterProject, uIterSelect,
      uIterInsert, uIterDelete, uIterUpdate,
      uIterSet,
      uIterInto,
-     uLog, sysUtils,
+   {$IFDEF Debug_Log}
+     uLog,
+   {$ENDIF}     
+     sysUtils,
      uTuple {just for unused result from FindCol},
      uRelation {for constraintListPtr},
      uMarshalGlobal {for errors};
@@ -107,19 +110,21 @@ begin
   {$IFNDEF NO_REWRITER}
   if Ttransaction(st.owner).db.SysOption[otOptimiser].value<>0 then
   begin
-    log.Status;
+//    log.Status;
     {$IFDEF DEBUG_DETAIL}
     {$IFDEF DEBUG_LOG}
+    Log.Status;
     //no use? displaySyntaxTree(aroot.nodeRef);
     {$ENDIF}
     {$ENDIF}
     optimiseOk:=Optimise(st,sroot,aroot); //note the result for later (i.e. can we trust some of the annotations?)
     {$IFDEF DEBUG_DETAIL}
     {$IFDEF DEBUG_LOG}
+    Log.Status;
     //no use? displaySyntaxTree(aroot.nodeRef);
     {$ENDIF}
     {$ENDIF}
-    log.Status;
+//    log.Status;
   end;
   //else optimiser disabled
   {$ENDIF}

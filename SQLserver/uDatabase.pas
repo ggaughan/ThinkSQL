@@ -218,11 +218,16 @@ var
 
 implementation
 
-uses uBuffer, uLog, uServer, uRelation, uTuple,
-     uFile, uParser, uGlobalDef, uPage, uTransaction, uProcessor,
-     uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures},
-     uGarbage {for detachAnyTransactions (disconnection)}, uOS{for sleepOS}
-     ;
+uses
+  uBuffer,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}
+  uServer, uRelation, uTuple,
+  uFile, uParser, uGlobalDef, uPage, uTransaction, uProcessor,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures},
+  uGarbage {for detachAnyTransactions (disconnection)}, uOS{for sleepOS}
+  ;
 
 const
   where='uDatabase';

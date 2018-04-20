@@ -70,7 +70,10 @@ type
 implementation
 
 uses
-  uLog, sysUtils, uServer,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uServer,
   uBuffer{for stats}, uSyntax{for debug status}, uTransaction,
   uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for sqltimestamp},
   classes {for PPointerList}, Math {for power}

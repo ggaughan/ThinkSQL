@@ -1,4 +1,4 @@
-unit uIterSet;
+﻿unit uIterSet;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -63,7 +63,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uMarshalGlobal, uIterSort{for pushing down corresponding columns};
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uMarshalGlobal, uIterSort{for pushing down corresponding columns};
 
 const
   where='uIterSet';

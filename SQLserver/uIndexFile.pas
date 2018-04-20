@@ -1,4 +1,4 @@
-unit uIndexFile;
+﻿unit uIndexFile;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -84,7 +84,11 @@ type
 
 implementation
 
-uses uLog, SysUtils, classes {for TBits}, uTransaction;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils, classes {for TBits}, uTransaction;
 
 const
   who='';

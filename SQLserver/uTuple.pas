@@ -1,4 +1,4 @@
-unit uTuple;
+﻿unit uTuple;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -333,9 +333,13 @@ var
 
 implementation
 
-uses uLog, sysUtils, uRelation, uServer, uTransaction,
-uAlgebra {for source node pointing}, uIterator, uHeapFile {for header updates}, Math {for power}, uIndexFile{for readToIndex},
-uVariableSet;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uRelation, uServer, uTransaction,
+  uAlgebra {for source node pointing}, uIterator, uHeapFile {for header updates}, Math {for power}, uIndexFile{for readToIndex},
+  uVariableSet;
 
 const
   where='uTuple';

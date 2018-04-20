@@ -28,7 +28,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uOS{for sleep}, uRelation,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uOS{for sleep}, uRelation,
      uHeapFile, uHashIndexFile, uPage{for invalidPageId}, uServer;
 
 const

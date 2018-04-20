@@ -1,4 +1,4 @@
-unit uBuffer;
+﻿unit uBuffer;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -102,7 +102,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uTransaction, uOS;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uTransaction, uOS;
 
 const
   where='uBuffer';

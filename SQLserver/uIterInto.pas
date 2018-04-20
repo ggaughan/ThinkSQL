@@ -1,4 +1,4 @@
-unit uIterInto;
+﻿unit uIterInto;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -36,9 +36,13 @@ type
 
 implementation
 
-uses uLog, sysUtils, uGlobal, uTuple, uEvalCondExpr, uVariableSet,
-uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
-;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uGlobal, uTuple, uEvalCondExpr, uVariableSet,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
+  ;
 
 const
   where='uIterInto';

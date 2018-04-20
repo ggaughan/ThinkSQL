@@ -75,17 +75,21 @@ function UnPreparePlan(stmt:Tstmt):integer;
 
 implementation
 
-uses uLog, SysUtils, uRelation, uServer,
- uOptimiser, uCondToCNF, uParser {for ExecSQL}, uDatabase {for create catalog},
- uIterStmt,
- uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
- uHashIndexFile, uConstraint, IdTCPServer {for connection handle via tr.thread},
- uRoutine, uVariableSet, uEvalCondExpr, uIterInto{for dynamic fetch},
- uDatabaseMaint, uPage{debug only}
- ,uConnectionMgr{for access to TCMthread for shutdown check},
- uGarbage
- ,uEvsHelpers
- ;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils, uRelation, uServer,
+  uOptimiser, uCondToCNF, uParser {for ExecSQL}, uDatabase {for create catalog},
+  uIterStmt,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
+  uHashIndexFile, uConstraint, IdTCPServer {for connection handle via tr.thread},
+  uRoutine, uVariableSet, uEvalCondExpr, uIterInto{for dynamic fetch},
+  uDatabaseMaint, uPage{debug only}
+  ,uConnectionMgr{for access to TCMthread for shutdown check},
+  uGarbage
+  ,uEvsHelpers
+  ;
 
 const
   where='uProcessor';

@@ -1,4 +1,4 @@
-unit uIterInsert;
+﻿unit uIterInsert;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -36,7 +36,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uGlobalDef, uProcessor,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uGlobalDef, uProcessor,
      uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
      uConstraint, uOS {for getSystemUser (was Windows & so had to prefix maxSMALLINT with uGlobal)},
      uRelation{for sysGenerator lookup for DEFAULTs};

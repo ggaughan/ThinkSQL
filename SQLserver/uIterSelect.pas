@@ -1,4 +1,4 @@
-unit uIterSelect;
+﻿unit uIterSelect;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -34,7 +34,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uGlobal, {uTuple,} uEvalCondExpr;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uGlobal, {uTuple,} uEvalCondExpr;
 
 const
   where='uIterSelect';

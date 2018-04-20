@@ -19,7 +19,11 @@ function CondToCNF(srootAlloc:TSyntaxNodePtr;var snode:TSyntaxNodePtr):integer;
 
 implementation
 
-uses uGlobal, uLog, SysUtils;
+uses uGlobal,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils;
 
 const
   where='uCondToCNF';

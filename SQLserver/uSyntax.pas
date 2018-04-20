@@ -443,7 +443,12 @@ var
 
 implementation
 
-uses uLog, sysUtils, uAlgebra, uIterator {for deleting trees}, uIterMaterialise;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+
+  sysUtils, uAlgebra, uIterator {for deleting trees}, uIterMaterialise;
 
 const
   where='uSyntax';

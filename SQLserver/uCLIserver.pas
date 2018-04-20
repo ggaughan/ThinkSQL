@@ -93,7 +93,10 @@ function SQLGetConnectAttr(th:TCMthread):integer;
 
 implementation
 
-uses uLog,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
      uMarshal {in '..\Odbc\uMarshal.pas'}, uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'},
      sysUtils, uGlobal, uGlobalDef,
      uParser, uProcessor{for executePlan}, uIterator, {for Fetch=plan.next}

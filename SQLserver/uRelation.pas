@@ -1,4 +1,4 @@
-unit uRelation;
+﻿unit uRelation;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -130,9 +130,13 @@ var
 
 implementation
 
-uses uLog, uTransaction, uHeapFile, uVirtualFile, uServer, sysUtils, uPage, uGlobalDef,
- uEvalCondExpr {for matchTuples - todo:belongs in uTuple really...},
- uHashIndexFile;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  uTransaction, uHeapFile, uVirtualFile, uServer, sysUtils, uPage, uGlobalDef,
+  uEvalCondExpr {for matchTuples - todo:belongs in uTuple really...},
+  uHashIndexFile;
 
 const
   where='uRelation';

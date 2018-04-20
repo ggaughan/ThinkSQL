@@ -1,4 +1,4 @@
-unit uVariableSet;
+﻿unit uVariableSet;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -145,7 +145,11 @@ var
 
 implementation
 
-uses uLog, uStmt, sysUtils, uTuple, uTransaction, uOS {for getSystemUser}, Math {for power}
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  uStmt, sysUtils, uTuple, uTransaction, uOS {for getSystemUser}, Math {for power}
 ;
 
 const

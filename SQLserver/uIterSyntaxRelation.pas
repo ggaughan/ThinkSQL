@@ -1,4 +1,4 @@
-unit uIterSyntaxRelation;
+﻿unit uIterSyntaxRelation;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -39,7 +39,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uGlobal, uEvalCondExpr;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uGlobal, uEvalCondExpr;
 
 const
   where='uIterSyntaxRelation';

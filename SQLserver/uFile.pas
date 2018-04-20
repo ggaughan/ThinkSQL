@@ -203,7 +203,10 @@ var
 implementation
 
 uses
-  uLog, sysUtils, uServer, uTransaction, uOS {for sleep}
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uServer, uTransaction, uOS {for sleep}
   ,uEvsHelpers
   ;
 

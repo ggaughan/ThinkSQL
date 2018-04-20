@@ -127,8 +127,10 @@ var
   //todo we should keep count of number of contentions
 implementation
 
+{$IFDEF Debug_Log}
 uses uLog
      ; //todo remove
+{$ENDIF}     
 
 const
   where='uPage';

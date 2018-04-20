@@ -1,4 +1,4 @@
-unit uRoutine;
+﻿unit uRoutine;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -46,8 +46,12 @@ var
 
 implementation
 
-uses uLog, uTransaction, sysUtils, uRelation{for getOwnerDetails}, uGlobalDef,
- uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  uTransaction, sysUtils, uRelation{for getOwnerDetails}, uGlobalDef,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
 ;
 
 const

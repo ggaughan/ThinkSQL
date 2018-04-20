@@ -269,7 +269,12 @@ var
 
 implementation
 
-uses uFile, uServer, uRelation, uTuple, uLog, uPage,
+uses
+  uFile, uServer, uRelation, uTuple,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  uPage,
      uConnectionMgr{for access to TCMthread for kill: todo use TIdPeerThread instead}, Math{for power}
      (*,uIterator{for stmt close/clean}, uProcessor {for unprepare - move to uparser?}*)
      ,uOS {for kill sleep}

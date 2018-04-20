@@ -1,4 +1,4 @@
-unit uAlgebra;
+﻿unit uAlgebra;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -126,7 +126,11 @@ var
 
 implementation
 
-uses uLog, sysUtils;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}
+  sysUtils;
 
 const
   where='uAlgebra';

@@ -1,4 +1,4 @@
-unit uIterUpdate;
+﻿unit uIterUpdate;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -33,7 +33,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uGlobalDef,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uGlobalDef,
      uEvalCondExpr, uProcessor,
      uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
      uConstraint;
