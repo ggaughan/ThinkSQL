@@ -307,23 +307,29 @@ begin
          
          yyval:=yyv[yysp-0];
          GlobalParseRoot:=yyval;
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_list (sql) %p',[yyval]),vDebug);
+       {$ENDIF}
          yyaccept;
          (* todo ok? *)
-         
+
        end;
    2 : begin
-         
+
          GlobalParseRoot:=nil;
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_list (;) %p',[yyval]),vDebug);
+       {$ENDIF}
          yyaccept;
          (* todo ok? *)
-         
+
        end;
    3 : begin
-         
+
          GlobalParseRoot:=nil;
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('nothing %p',[yyval]),vDebug);
+       {$ENDIF}         
          yyaccept;
          (* todo ok? *)
          
@@ -331,8 +337,10 @@ begin
    4 : begin
          
          (* yyval:=yyv[yysp-0]; *)
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,yyval]),vError);
          log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+       {$ENDIF}         
          GlobalSyntaxErrLine:=yylineno;
          GlobalSyntaxErrCol:=yycolno;
          GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -350,86 +358,104 @@ begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundBlock,ctUnknown,yyv[yysp-2],yyv[yysp-3]);
          if yyv[yysp-5]<>nil then begin yyval.idVal:=yyv[yysp-5].idVal; deleteSyntaxTree(yyv[yysp-5]); end;
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound (block) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
+
        end;
    6 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundWhile,ctUnknown,yyv[yysp-3],yyv[yysp-5]);
          if yyv[yysp-7]<>nil then begin yyval.idVal:=yyv[yysp-7].idVal; deleteSyntaxTree(yyv[yysp-7]); end;
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound (while) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
+
        end;
    7 : begin
          
          chainAppendNext(yyv[yysp-4],yyv[yysp-3]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundIf,ctUnknown,yyv[yysp-4],yyv[yysp-2]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound (if) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
        end;
    8 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundLoop,ctUnknown,yyv[yysp-3],nil);
          if yyv[yysp-5]<>nil then begin yyval.idVal:=yyv[yysp-5].idVal; deleteSyntaxTree(yyv[yysp-5]); end;
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound (loop) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
        end;
    9 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundRepeat,ctUnknown,yyv[yysp-5],yyv[yysp-3]);
          if yyv[yysp-7]<>nil then begin yyval.idVal:=yyv[yysp-7].idVal; deleteSyntaxTree(yyv[yysp-7]); end;
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound (repeat) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
        end;
   10 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundCase,ctUnknown,yyv[yysp-3],yyv[yysp-2]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound (case) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
   11 : begin
-         
+
          yyval:=yyv[yysp-0];
-         
+
        end;
   12 : begin
          yyval:=nil;
        end;
   13 : begin
-         
+
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntNotAtomic,ctUnknown,0,0);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('atomicity (not atomic) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   14 : begin
-         
+
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntAtomic,ctUnknown,0,0);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('atomicity (atomic) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   15 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntIfThen,ctUnknown,yyv[yysp-2],yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('condition_then_action %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   16 : begin
-         
+
          yyval:=yyv[yysp-0];
-         
+
        end;
   17 : begin
-         
+
          chainAppendNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1]; (* todo reverse list before processing? already done? *)
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('elseif_condition_then_action_list (list,e) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   18 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('elseif_condition_then_action_list (e) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   19 : begin
          yyval:=yyv[yysp-0];
@@ -438,10 +464,11 @@ begin
          yyval:=nil;
        end;
   21 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('else_action %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
   22 : begin
          yyval:=yyv[yysp-0];
@@ -450,22 +477,24 @@ begin
          yyval:=nil;
        end;
   24 : begin
-         
+
          yyval:=yyv[yysp-0];
-         
+
        end;
   25 : begin
-         
+
          chainAppendNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1]; (* todo reverse list before processing? already done? *)
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('when_condition_then_action_list (list,e) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
   26 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('when_condition_then_action_list (e) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
   27 : begin
          yyval:=yyv[yysp-0];
@@ -474,29 +503,36 @@ begin
          yyval:=nil;
        end;
   29 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundElement,ctUnknown,yyv[yysp-1],nil); (* wrapped to allow separate tree deletion without breaking chain *)
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound_element (sql ;) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
   30 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundElement,ctUnknown,yyv[yysp-1],nil); (* wrapped to allow separate tree deletion without breaking chain *)
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound_element (sql_compound ;) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   31 : begin
-         
+
          chainAppendNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1]; (* todo reverse list before processing? already done? *)
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound_list (list,e) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   32 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sql_compound_list (e) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   33 : begin
          yyval:=yyv[yysp-0];
@@ -526,341 +562,451 @@ begin
          yyval := yyv[yysp-0];
        end;
   42 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (connect) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   43 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (disconnect) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   44 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (set schema) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   45 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (commit) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   46 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (commit) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
   47 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (set transaction) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   48 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (set constraints) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   49 : begin
-         
+
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntSHOWTRANS,ctUnknown,0,0);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (SHOWTRANS) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
   50 : begin
-         
+
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntSHUTDOWN,ctUnknown,0,0);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connection (SHUTDOWN) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   51 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (catalog_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   52 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (user_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   53 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (user_alteration) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   54 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (user_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   55 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (index_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   56 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (index_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   57 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (sequence_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   58 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (sequence_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   59 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (debug_table) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   60 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (debug_index) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   61 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (debug_catalog) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   62 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (debug_server) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
   63 : begin
-         
+
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (debug_page) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   64 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (debug_plan) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   65 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (debug_print) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   66 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (kill) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   67 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (cancel) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   68 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (rebuild_index) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   69 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (catalog_backup) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   70 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (catalog_open) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   71 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (catalog_close) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   72 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined (catalog_garbage_collect) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   73 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('ddl (base_table_alteration) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   74 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('ddl (schema_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   75 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('ddl (domain_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   76 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('ddl (base_table_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   77 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('ddl (view_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   78 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('ddl (routine_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   79 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('ddl (authorization_drop) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   80 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (table_exp) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   81 : begin
          
          yyval:=yyv[yysp-1];
          chainNext(yyval,yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (table_exp order by) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   82 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (insert) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   83 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (searched_update) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   84 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (searched_delete) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   85 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (call_routine) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   86 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (declaration) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   87 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (open) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
+
        end;
   88 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (close) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
+
        end;
   89 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (close) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
   90 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (assignment) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   91 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (return) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   92 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (leave) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   93 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (iterate) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   94 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('dml (single_row_select) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   95 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateCatalog,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('catalog_def %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   96 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateUser,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('user_def %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   97 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAlterUser,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('user_alteration %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
   98 : begin
          
@@ -875,75 +1021,99 @@ begin
  100 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropUser,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('user_drop %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  101 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateIndex,ctUnknown,yyv[yysp-5],yyv[yysp-3]);
          chainNext(yyval,yyv[yysp-1]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('index_def %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  102 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateSequence,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sequence_def %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  103 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropSequence,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sequence_drop %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  104 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropIndex,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('index_drop %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  105 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGTABLE,ctUnknown,yyv[yysp-0],yyv[yysp-1]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('debug_table (debug table...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  106 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGINDEX,ctUnknown,yyv[yysp-0],yyv[yysp-1]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('debug_index (debug index...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  107 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGCATALOG,ctUnknown,yyv[yysp-0],yyv[yysp-1]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('debug_catalog (debug catalog...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  108 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGSERVER,ctUnknown,nil,yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('debug_server (debug server...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  109 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGPAGE,ctUnknown,yyv[yysp-0],yyv[yysp-1]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('debug_page (debug page...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  110 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGPLAN,ctUnknown,yyv[yysp-0],yyv[yysp-1]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('debug_plan (debug plan...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  111 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGPRINT,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('debug_print (debug print...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  112 : begin
          
@@ -964,71 +1134,93 @@ begin
  116 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntKillTran,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('kill_tran %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  117 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCancelTran,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('cancel_tran %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  118 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntREBUILDINDEX,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('rebuild_index (rebuild index...) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  119 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntBackupCatalog,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('catalog_backup %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  120 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOpenCatalog,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('catalog_open %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  121 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCloseCatalog,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('catalog_close %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  122 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntGarbageCollectCatalog,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('catalog_garbage_collect %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  123 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntIndex,ctUnknown,nil,yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('index (identifier) %p, yylval=%p',[yyval,yylval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  124 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,yyv[yysp-4]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSequence,ctUnknown,node,yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sequence (catalog.schema.sequence) %p, yylval=%p',[yyval,yylval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  125 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSequence,ctUnknown,node,yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sequence (schema.sequence) %p, yylval=%p',[yyval,yylval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  126 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSequence,ctUnknown,nil,yyv[yysp-0]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('sequence (sequence) %p, yylval=%p',[yyval,yylval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  127 : begin
          
@@ -1037,194 +1229,249 @@ begin
          chainNext(node,yyv[yysp-1]);
          chainNext(node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConnect,ctUnknown,yyv[yysp-3],node);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connect %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  128 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConnect,ctUnknown,nil,nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connect (to default) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  129 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('disconnect %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  130 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,nil,nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connect (default) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  131 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,nil,nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connect (current) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  132 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,nil,nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('connect (all) %p',[yyval]),vDebug);
+       {$ENDIF}         
          
        end;
  133 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSetSchema,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('set_schema %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  134 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSetSchema,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('set_schema %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  135 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCommit,ctUnknown,0,0);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('commit %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  136 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntRollback,ctUnknown,0,0);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('rollback %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}
        end;
  137 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSetTransaction,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('set_transaction %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
  138 : begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('option_commalist (e,list) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
+
        end;
  139 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('option (e) %p',[yyval]),vDebug);
-         
+        {$ENDIF}         
        end;
  140 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOptionDiagnostic,ctUnknown,yyv[yysp-0],nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('option (diagnostic size) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
  141 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOptionReadOnly,ctUnknown,nil,nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('option (read only) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
  142 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOptionReadWrite,ctUnknown,nil,nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('option (read write) %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
  143 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationReadUncommitted,ctUnknown,nil,nil);
-         log.add(yywho,yywhere,format('option (isolation read uncommitted) %p',[yyval]),vDebug);
-         
+          {$IFDEF Debug_LOG}
+           log.add(yywho,yywhere,format('option (isolation read uncommitted) %p',[yyval]),vDebug);
+         {$endif}
+
        end;
  144 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationReadCommitted,ctUnknown,nil,nil);
-         log.add(yywho,yywhere,format('option (isolation read committed) %p',[yyval]),vDebug);
-         
+          {$IFDEF Debug_LOG}
+           log.add(yywho,yywhere,format('option (isolation read committed) %p',[yyval]),vDebug); 
+         {$endif}
+
        end;
  145 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationRepeatableRead,ctUnknown,nil,nil);
-         log.add(yywho,yywhere,format('option (isolation repeatable read) %p',[yyval]),vDebug);
-         
+          {$IFDEF Debug_LOG}
+           log.add(yywho,yywhere,format('option (isolation repeatable read) %p',[yyval]),vDebug);
+         {$endif}
        end;
  146 : begin
-         
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationSerializable,ctUnknown,nil,nil);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('option (isolation serializable) %p',[yyval]),vDebug);
-         
+       {$ENDIF}         
+
        end;
  147 : begin
-         
+
          node:=mkNode(GlobalParseStmt.srootAlloc,ntAuthorization,ctUnknown,yyv[yysp-3],nil);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateSchema,ctUnknown,nil,yyv[yysp-0]);
          chainNext(yyval,yyv[yysp-1]);
          chainNext(yyval,node);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('schema_def authorization %p',[yyval]),vDebug);
-         
+       {$ENDIF}
        end;
  148 : begin
-         
+
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateSchema,ctUnknown,yyv[yysp-3],yyv[yysp-0]);
          chainNext(yyval,yyv[yysp-1]);
          chainNext(yyval,yyv[yysp-2]);
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('schema_def %p',[yyval]),vDebug);
-         
+       {$ENDIF}
+
        end;
  149 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('schema_element (domain_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  150 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('schema_element (base_table_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  151 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('schema_element (view_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  152 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('schema_element (routine_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  153 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('schema_element (authorization_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  154 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined schema_element (index_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  155 : begin
          
          yyval:=yyv[yysp-0];
+       {$IFDEF Debug_LOG}
          log.add(yywho,yywhere,format('implementation_defined schema_element (sequence_def) %p',[yyval]),vDebug);
-         
+
+       {$ENDIF}         
        end;
  156 : begin
          
          chainAppendNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1]; (* todo reverse list before processing? already done? *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('schema_element_list (list,e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  157 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('schema_element_list (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  158 : begin
@@ -1236,7 +1483,9 @@ begin
  160 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDefault,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('default_def %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  161 : begin
@@ -1287,7 +1536,9 @@ begin
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          chainNext(yyv[yysp-2],yyv[yysp-1]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateDomain,ctUnknown,yyv[yysp-4],yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('domain_def (create domain...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  175 : begin
@@ -1303,19 +1554,25 @@ begin
          chainNext(yyv[yysp-4],yyv[yysp-0]);
          chainNext(yyv[yysp-4],yyv[yysp-6]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateTable,ctUnknown,yyv[yysp-4],yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_def (create table...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  178 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntGlobalTemporary,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_def_OPT_temp (global temporary) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  179 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntLocalTemporary,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_def_OPT_temp (local temporary) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  180 : begin
@@ -1324,13 +1581,17 @@ begin
  181 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntOnCommitDelete,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_def_OPT_commit (on commit delete rows) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  182 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntOnCommitPreserve,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_def_OPT_commit (on commit preserve rows) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  183 : begin
@@ -1339,26 +1600,34 @@ begin
  184 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_element (column_def) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  185 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_element (base_table_constraint_def) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  186 : begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_element_commalist (e,list) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  187 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_element_commalist (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  188 : begin
@@ -1366,7 +1635,9 @@ begin
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          chainNext(yyv[yysp-2],yyv[yysp-1]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntColumnDef,ctUnknown,yyv[yysp-3],yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_def (column datatype...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  189 : begin
@@ -1374,7 +1645,9 @@ begin
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          chainNext(yyv[yysp-2],yyv[yysp-1]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntColumnDef,ctUnknown,yyv[yysp-3],yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_def (column domain...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  190 : begin
@@ -1400,14 +1673,18 @@ begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateView,ctUnknown,yyv[yysp-4],yyv[yysp-1]);
          if check_start_text<>'' then  (* store view definition (has leading NAME AS and trailing LEXEME which we remove) *)
          yyval.strVal:=copy(check_start_text,1,yyoffset-check_start_at -length(yytext));
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('view_def (create view...) %p is at %d,%d (%d,%d %s)',[yyval,yylineNo,yycolno,check_start_at,yyoffset,yyval.strVal]),vDebug);
+{$ENDIF}
          check_start_text:='';
          
        end;
  195 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntWithCheckOption,ctUnknown,yyv[yysp-3],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('view_def_OPT_with (with check option) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  196 : begin
@@ -1439,7 +1716,9 @@ begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCreateRoutine,ctUnknown,yyv[yysp-5],yyv[yysp-0]);
          if check_start_text<>'' then  (* store routine definition (has leading NAME AS and trailing LEXEME which we remove) *)
          yyval.strVal:=copy(check_start_text,1,yyoffset-check_start_at -length(yytext));
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine_def (create procedure/function...) %p is at %d,%d (%d,%d %s)',[yyval,yylineNo,yycolno,check_start_at,yyoffset,yyval.strVal]),vDebug);
+{$ENDIF}
          check_start_text:='';
          
        end;
@@ -1447,13 +1726,17 @@ begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine_parameter_commalist (e,list) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  202 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine_parameter_commalist (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  203 : begin
@@ -1469,7 +1752,9 @@ begin
          chainNext(yyv[yysp-1],yyv[yysp-3]);
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntParameterDef,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine_parameter_def (routine_parameter datatype...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  206 : begin
@@ -1479,7 +1764,9 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntId,ctUnknown,0,0);
          node.idVal:=FunctionReturnParameterName;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntParameterDef,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine_def_OPT_returns (returns) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  207 : begin
@@ -1496,19 +1783,25 @@ begin
  210 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntIn,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('direction (in) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  211 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntOut,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('direction (out) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  212 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntInOut,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('direction (inout) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  213 : begin
@@ -1529,14 +1822,18 @@ begin
          chainNext(yyv[yysp-8],yyv[yysp-4]);
          chainNext(yyv[yysp-8],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCursorDeclaration,ctUnknown,yyv[yysp-8],yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('declaration cursor %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  216 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDeclaration,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('declaration %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  217 : begin
@@ -1613,13 +1910,17 @@ begin
  232 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOpen,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('open %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  233 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntClose,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('close %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  234 : begin
@@ -1627,7 +1928,9 @@ begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntFetch,ctUnknown,yyv[yysp-3],yyv[yysp-2]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntInto,ctUnknown,yyv[yysp-0],nil);
          chainNext(yyval,node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('fetch %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  235 : begin
@@ -1671,25 +1974,33 @@ begin
  243 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAssignment,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('assignment %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  244 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntReturn,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('return %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  245 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntLeave,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('leave %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  246 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntIterate,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('iterate %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  247 : begin
@@ -1697,37 +2008,49 @@ begin
          chainNext(yyv[yysp-3],yyv[yysp-5]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntGrant,ctUnknown,yyv[yysp-3],yyv[yysp-1]);
          chainNext(yyval,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authorization_def (grant...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  248 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyDeferred,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('deferrability (initially deferred...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  249 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyDeferred,ctUnknown,yyv[yysp-2],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('deferrability (...initially deferred) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  250 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyImmediate,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('deferrability (initially immediate...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  251 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyImmediate,ctUnknown,yyv[yysp-2],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('deferrability (...initially immediate) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  252 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyImmediate,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('deferrability (...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  253 : begin
@@ -1741,19 +2064,25 @@ begin
  255 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntNotDeferrable,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('deferrable (not deferrable) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  256 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntDeferrable,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('deferrable (deferrable) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  257 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntAllPrivileges,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege_commalist_or_all (all privileges) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  258 : begin
@@ -1765,122 +2094,162 @@ begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege_commalist (e,list) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  260 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  261 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeSelect,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (select) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  262 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeInsert,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (insert) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  263 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeUpdate,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (update) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  264 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeDelete,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (delete) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  265 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeReferences,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (references) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  266 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeUsage,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (usage) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  267 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeExecute,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('privilege (execute) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  268 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (domain) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  269 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (TABLE table) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  270 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCharacterSet,ctUnknown,yyv[yysp-0],nil);  //todo maybe should go in character_set:
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (character_set) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  271 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCollation,ctUnknown,yyv[yysp-0],nil);    //todo maybe should go in collation:
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (collation) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  272 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTranslation,ctUnknown,yyv[yysp-0],nil);    //todo maybe should go in translation:
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (translation) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  273 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (ROUTINE routine) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  274 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (PROCEDURE routine) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  275 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (FUNCTION routine) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  276 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('accessible_object (table) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  277 : begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('grantee_commalist (e,list) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  278 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('grantee_commalist (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  279 : begin
@@ -1896,7 +2265,9 @@ begin
  281 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntWithGrantOption,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authorization_def_OPT_with (with grant option) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  282 : begin
@@ -1905,7 +2276,9 @@ begin
  283 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAlterTable,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_alteration %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  284 : begin
@@ -1917,19 +2290,25 @@ begin
  286 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAddColumn,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_alteration_action (add column) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  287 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAlterColumn,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_alteration_action (alter column) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  288 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropColumn,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_alteration_action (drop column) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  289 : begin
@@ -1945,44 +2324,58 @@ begin
  291 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAddConstraint,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_constraint_alteration_action (add constraint) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  292 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropConstraint,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_constraint_alteration_action (drop constraint) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  293 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropSchema,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('schema_drop %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  294 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropDomain,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('domain_drop %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  295 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropTable,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_drop %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  296 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropView,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('view_drop %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  297 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDropRoutine,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine_drop %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  298 : begin
@@ -2001,13 +2394,17 @@ begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntRevoke,ctUnknown,yyv[yysp-3],yyv[yysp-1]);
          chainNext(yyval,yyv[yysp-0]);
          chainNext(yyval,yyv[yysp-6]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authorization_drop (revoke...) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  301 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntWithGrantOption,ctUnknown,0,0);    //we re-use syntax node
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authorization_drop_OPT_for (grant option for) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  302 : begin
@@ -2022,7 +2419,9 @@ begin
  305 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntInsert,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('insert %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  306 : begin
@@ -2039,19 +2438,25 @@ begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntUpdate,ctUnknown,yyv[yysp-3],yyv[yysp-0]);
          chainNext(yyval,yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('searched_update %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  309 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntUpdateAssignment,ctUnknown,yyv[yysp-2],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('update_assignment (column=DEFAULT) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  310 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntUpdateAssignment,ctUnknown,yyv[yysp-2],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('update_assignment (column=scalar_exp) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  311 : begin
@@ -2068,13 +2473,17 @@ begin
  313 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDelete,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('searched_delete %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  314 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOrderBy,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table_exp_OPT_orderby %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  315 : begin
@@ -2083,14 +2492,20 @@ begin
  316 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOrderItem,yyv[yysp-1].dtype(*ctUnknown*),yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('order_item (column) %p',[yyval]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('  $1.dtype=%d',[ord(yyv[yysp-1].dtype)]),vDebug);
+{$ENDIF}
          
        end;
  317 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOrderItem,yyv[yysp-1].dtype(*ctUnknown*),yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('order_item (integer) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  318 : begin
@@ -2107,7 +2522,9 @@ begin
  320 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCallRoutine,ctUnknown,yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('call_routine (call) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  321 : begin
@@ -2124,7 +2541,9 @@ begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntCrossJoin,ctUnknown,yyv[yysp-0],yyv[yysp-3]);   
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntJoinTableExp,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('join_table_exp (table_ref cross join table_ref) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  324 : begin
@@ -2137,13 +2556,17 @@ begin
          chainNext(node,yyv[yysp-4]);
          chainNext(node,yyv[yysp-3]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntJoinTableExp,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('join_table_exp (table_ref [natural] [join type] join table_ref [on/using...]) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  325 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntJoinTableExp,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('join_table_exp (join_table_ref) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  326 : begin
@@ -2168,19 +2591,25 @@ begin
  331 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTableRef,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table_ref (join_table_exp) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  332 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTableRef,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table_ref (table [as]) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  333 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTableRef,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table_ref (table) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  334 : begin
@@ -2204,13 +2633,17 @@ begin
  337 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCrossJoin,ctUnknown,yyv[yysp-2],yyv[yysp-0]); (* todo swap L and R back? todo replace ntCrossJoin with dummyNode *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table_ref_commalist (list,e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  338 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCrossJoin,ctUnknown,nil,yyv[yysp-0]); (* todo replace ntCrossJoin with dummyNode *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table_ref_commalist (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  339 : begin
@@ -2241,7 +2674,9 @@ begin
  344 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableExp,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_exp (nonjoin_table_term) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  345 : begin
@@ -2251,7 +2686,9 @@ begin
          chainNext(node,yyv[yysp-2]);
          chainNext(node,yyv[yysp-3]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableExp,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_exp (table_exp [union/except] [all] [corresponding...] table_term) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  346 : begin
@@ -2270,7 +2707,9 @@ begin
  349 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableTerm,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_term (nonjoin_table_primary) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  350 : begin
@@ -2279,7 +2718,9 @@ begin
          chainNext(node,yyv[yysp-1]);
          chainNext(node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableTerm,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_term (table_term intersect [all] [corresponding...] table_primary) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  351 : begin
@@ -2305,63 +2746,83 @@ begin
  355 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_primary ( (nonjoin_table_exp) ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  356 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_primary ( select_exp ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  357 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_primary ( TABLE table ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  358 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('nonjoin_table_primary ( table_constructor ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  359 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTableConstructor,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table_constructor %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  360 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('row_constructor ( scalar_exp_commalist ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  361 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('row_constructor ( table_exp ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  362 : begin
          
          //Note: moving this below the other 2 reduce the conflicts enormously! - not sure any more...
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('row_constructor (scalar_exp) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  363 : begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('row_constructor_commalist ( rc,rcclist ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  364 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('row_constructor_commalist ( rc ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  365 : begin
@@ -2371,14 +2832,20 @@ begin
          chainNext(yyval,yyv[yysp-0]);
          chainNext(yyval,yyv[yysp-1]);
          chainNext(yyval,yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('select_exp %p',[yyval]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('  $$.dtype=%d',[ord(yyval.dtype)]),vDebug);
+{$ENDIF}
          
        end;
  366 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntWhere,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('select_exp_OPT_where %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  367 : begin
@@ -2414,26 +2881,36 @@ begin
  374 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSelectItem,yyv[yysp-1].dtype(*ctUnknown*),yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('select_item (scalar_exp [as...]) %p',[yyval]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('  $1.dtype=%d',[ord(yyv[yysp-1].dtype)]),vDebug);
+{$ENDIF}
          
        end;
  375 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSelectAll,ctUnknown,yyv[yysp-2],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('select_item (range.*) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  376 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSelectAll,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('select_item (*) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  377 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('select_item_OPT_ascolumn %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  378 : begin
@@ -2456,8 +2933,12 @@ begin
          chainNext(yyval,yyv[yysp-0]);
          chainNext(yyval,yyv[yysp-1]);
          chainNext(yyval,yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('single_row_select %p',[yyval]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('  $$.dtype=%d',[ord(yyval.dtype)]),vDebug);
+{$ENDIF}
          
        end;
  382 : begin
@@ -2474,37 +2955,49 @@ begin
  384 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_exp (t) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  385 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOR,ctUnknown,yyv[yysp-2],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_exp (e OR t) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  386 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_term (f) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  387 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAND,ctUnknown,yyv[yysp-2],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_term (t AND f) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  388 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_factor (cond_test) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  389 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_factor (NOT cond_test) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  390 : begin
@@ -2512,7 +3005,9 @@ begin
          if yyv[yysp-0]=nil then
          begin
          yyval:=yyv[yysp-1];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_test %p',[yyval]),vDebug);
+{$ENDIF}
          end
          else
          begin
@@ -2521,7 +3016,9 @@ begin
          else
          linkLeftChild(yyv[yysp-0],yyv[yysp-1]);
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_test (cond_primary IS/IS NOT) %p',[yyval]),vDebug);
+{$ENDIF}
          end;
          
        end;
@@ -2531,12 +3028,16 @@ begin
          if yyv[yysp-1]=nil then
          begin
          yyval:=node;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('is... %p',[yyval]),vDebug);
+{$ENDIF}
          end
          else
          begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('is NOT... %p',[yyval]),vDebug);
+{$ENDIF}
          end;
          
        end;
@@ -2561,67 +3062,89 @@ begin
  396 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_primary (simple_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  397 : begin
          
          yyval:=yyv[yysp-1];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cond_primary ( (cond_exp) ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  398 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (all_or_any) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  399 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (comparison_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  400 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (between_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  401 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (like_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  402 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (in_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  403 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (match_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  404 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (exists_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  405 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (unique_cond) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  406 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('simple_cond (test_for_null) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  407 : begin
@@ -2629,43 +3152,57 @@ begin
          linkLeftChild(yyv[yysp-1],yyv[yysp-2]);
          linkRightChild(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('comparison_cond %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  408 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntEqual,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('comparison_operator (=) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  409 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntLT,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('comparison_operator (<) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  410 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntLTEQ,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('comparison_operator (<=) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  411 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntGT,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('comparison_operator (>) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  412 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntGTEQ,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('comparison_operator (>=) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  413 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNotEqual,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('comparison_operator (<>) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  414 : begin
@@ -2676,12 +3213,16 @@ begin
          if yyv[yysp-4]=nil then
          begin
          yyval:=node;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('between_cond %p',[yyval]),vDebug);
+{$ENDIF}
          end
          else
          begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('between_cond (NOT) %p',[yyval]),vDebug);
+{$ENDIF}
          end;
          
        end;
@@ -2697,7 +3238,9 @@ begin
          begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,yyv[yysp-1],nil);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntEqual,ctUnknown,yyv[yysp-4],node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('like_cond optimised to =%s %p',[yyv[yysp-1].leftChild.strVal,yyval]),vDebug);
+{$ENDIF}
          end;
          end
          else
@@ -2706,12 +3249,16 @@ begin
          if yyv[yysp-3]=nil then
          begin
          yyval:=node;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('like_cond %p DEBUG:%d',[yyval,ord(yyv[yysp-1].leftChild.nType)]),vDebug);
+{$ENDIF}
          end
          else
          begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('like_cond (NOT) %p',[yyval]),vDebug);
+{$ENDIF}
          end;
          
        end;
@@ -2729,14 +3276,18 @@ begin
          if yyv[yysp-4]=nil then
          begin
          yyval:=node;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('in_cond %p',[yyval]),vDebug);
+{$ENDIF}
          end
          else
          begin
          //Note: the way we convert NOT IN -> NOT(IN)
          //may not always be exactly correct for tuples: see Page 242/243?
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('in_cond (NOT) %p',[yyval]),vDebug);
+{$ENDIF}
          end;
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntAny,ctUnknown,0,0);
          chainNext(yyv[yysp-1],node);
@@ -2748,14 +3299,18 @@ begin
          if yyv[yysp-4]=nil then
          begin
          yyval:=node;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('in_cond (scalar) %p',[yyval]),vDebug);
+{$ENDIF}
          end
          else
          begin
          //Note: the way we convert NOT IN -> NOT(IN)
          //may not always be exactly correct for tuples: see Page 242/243?
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('in_cond (scalar) (NOT) %p',[yyval]),vDebug);
+{$ENDIF}
          end;
          
        end;
@@ -2764,7 +3319,9 @@ begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntMatch,ctUnknown,yyv[yysp-6],yyv[yysp-1]);
          chainNext(yyv[yysp-1],yyv[yysp-4]);
          chainNext(yyv[yysp-1],yyv[yysp-3]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('match_cond %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  421 : begin
@@ -2773,37 +3330,49 @@ begin
          linkRightChild(yyv[yysp-4],yyv[yysp-1]);
          chainNext(yyv[yysp-1],yyv[yysp-3]);
          yyval:=yyv[yysp-4];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('all_or_any_cond %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  422 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntAll,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('all %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  423 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntAny,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('any %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  424 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntAny,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('some (=any) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  425 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntExists,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('exists_cond %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  426 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntIsUnique,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('unique_cond %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  427 : begin
@@ -2812,14 +3381,18 @@ begin
          if yyv[yysp-1]=nil then
          begin
          yyval:=node;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('test_for_null (IS) %p',[yyval]),vDebug);
+{$ENDIF}
          end
          else
          begin
          //Note: the way we convert IS NOT NULL -> NOT(IS NULL)
          //is not always exactly correct for tuples: see Page 242/243
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('test_for_null (IS NOT) %p',[yyval]),vDebug);
+{$ENDIF}
          end;
          
        end;
@@ -2827,21 +3400,27 @@ begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_constraint_def (candidate_key_def) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  429 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_constraint_def (foreign_key_def) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  430 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_constraint_def (check) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  431 : begin
@@ -2935,7 +3514,9 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntCondExpText,ctVarChar,0,0);
          node.strVal:=copy(check_start_text,1,yyoffset-check_start_at);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCheckConstraint,ctUnknown,yyv[yysp-1],node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('check_constraint_def text is at %d,%d (%d,%d %s)',[yylineNo,yycolno,check_start_at,yyoffset,node.strVal]),vDebug);
+{$ENDIF}
          check_start_text:='';
          
        end;
@@ -2944,7 +3525,9 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNotNull,ctUnknown,0,0);
          chainNext(node,yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-3],node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_constraint_def (not null) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  453 : begin
@@ -2952,7 +3535,9 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntPrimaryKey,ctUnknown,0,0);
          chainNext(node,yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-3],node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_constraint_def (primary key) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  454 : begin
@@ -2960,21 +3545,27 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntUnique,ctUnknown,0,0);
          chainNext(node,yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-2],node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_constraint_def (unique) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  455 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_constraint_def (references) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  456 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_constraint_def (check) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  457 : begin
@@ -2992,51 +3583,67 @@ begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_constraint_def (check) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  460 : begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('constraint_commalist (e,list) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  461 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('constraint_commalist (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  462 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSetConstraints,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('set_constraints (ALL) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  463 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSetConstraints,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('set_constraints (constraint_commalist) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  464 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNumericExp,ctUnknown (*debug CASE? but broke group-by tests: ctFloat*)(*todo temp:had to cos still using SetDouble instead of Comp:ctNumeric*),yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_exp (generic_exp) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  465 : begin
          
          chainNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_exp_commalist (se,seclist) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  466 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_exp_commalist (se) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  467 : begin
@@ -3049,19 +3656,25 @@ begin
          
          chainAppendNext(yyv[yysp-2],yyv[yysp-0]);
          yyval:=yyv[yysp-2];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_exp_commalist_literal_order (se,seclist) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  470 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_exp_commalist_literal_order (se) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  471 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_exp (generic_term) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  472 : begin
@@ -3069,19 +3682,25 @@ begin
          linkLeftChild(yyv[yysp-1],yyv[yysp-2]);
          linkRightChild(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_exp (generic_exp +- generic_term) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  473 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_exp (generic_concatenation) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  474 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_term (generic_factor) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  475 : begin
@@ -3089,7 +3708,9 @@ begin
          linkLeftChild(yyv[yysp-1],yyv[yysp-2]);
          linkRightChild(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_term (generic_term /* generic_factor) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  476 : begin
@@ -3106,7 +3727,9 @@ begin
          node.numVal:=0;
          node.nullVal:=false;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntMinus,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_factor (- generic_primary) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  480 : begin
@@ -3115,13 +3738,17 @@ begin
          node.numVal:=0;
          node.nullVal:=false;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPlus,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_factor (+ generic_primary) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  481 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_factor (generic_primary) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  482 : begin
@@ -3145,19 +3772,25 @@ begin
  488 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_primary () %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  489 : begin
          
          yyval:=yyv[yysp-1];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_primary ( (table_exp) ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  490 : begin
          
          yyval:=yyv[yysp-1];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('generic_primary ( (generic_exp) ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  491 : begin
@@ -3165,7 +3798,9 @@ begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAggregate,ctUnknown,yyv[yysp-4],yyv[yysp-1]);
          chainNext(yyval,yyv[yysp-2]);
          (* todo check if yyv[yysp-4].ntype=ntSum or ntAvg then yyv[yysp-1].dtype must be numeric *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('aggregate_function_ref %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  492 : begin
@@ -3174,14 +3809,18 @@ begin
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAggregate,ctUnknown,yyval,yyv[yysp-1]);
          chainNext(yyval,yyv[yysp-2]);
          (* only needed because above does not beat below *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('aggregate_function_ref (COUNT(scalar_exp)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  493 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCount,ctNumeric,0,0);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntAggregate,ctNumeric,yyval,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('aggregate_function_ref (COUNT(*)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  494 : begin
@@ -3207,19 +3846,25 @@ begin
  500 : begin
          
          yyval:=yyv[yysp-5]; (* todo *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('overlaps_cond ( (scalar_exp,scalar_exp) OVERLAPS (scalar_exp,scalar_exp) ) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  501 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('catalog %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  502 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('schema (identifier) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  503 : begin
@@ -3227,26 +3872,34 @@ begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,yyv[yysp-4]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDomain,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('domain (catalog.schema.domain) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  504 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDomain,ctUnknown,node,yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('domain (schema.domain) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  505 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDomain,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('domain (domain) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  506 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  507 : begin
@@ -3255,7 +3908,9 @@ begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,yyv[yysp-4]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_ref (catalog.schema.table.column) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  508 : begin
@@ -3263,26 +3918,34 @@ begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-4]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_ref (schema.table.column) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  509 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,nil,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_ref (table.column) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  510 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('column_ref (column) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  511 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('table (base_table_OR_view) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  512 : begin
@@ -3303,20 +3966,26 @@ begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,yyv[yysp-4]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_OR_view (catalog.schema.table) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  516 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_OR_view (schema.table) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  517 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('base_table_OR_view (table) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  518 : begin
@@ -3324,38 +3993,50 @@ begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,yyv[yysp-4]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntRoutine,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine (catalog.schema.routine) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  519 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntRoutine,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine (schema.routine) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  520 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntRoutine,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine (routine) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  521 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('routine_parameter %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  522 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('compound_label %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  523 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('OPT_compound_label %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  524 : begin
@@ -3366,13 +4047,17 @@ begin
  525 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('compound_label_end %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  526 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('OPT_compound_label_end %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  527 : begin
@@ -3385,20 +4070,26 @@ begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,yyv[yysp-4]);
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,yyv[yysp-2]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraint,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('constraint (catalog.schema.constraint) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  529 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-0]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraint,ctUnknown,node,yyv[yysp-2]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('constraint (schema.constraint) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  530 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntConstraint,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('constraint (constraint) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  531 : begin
@@ -3451,20 +4142,26 @@ begin
          node.nullVal:=true;
          node.dwidth:=length(nullshow); (*todo only really for ISQL demo*)
          yyval:=node;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('param_or_var (null) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  540 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntDefault,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('param_or_var (default) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  541 : begin
          
          yyval:=yyv[yysp-0];
          globalParseStmt.addParam(yyval); (* todo check result *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('param_or_var (param) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  542 : begin
@@ -3506,67 +4203,89 @@ begin
  554 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authID_function_ref (user) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  555 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authID_function_ref (current_user) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  556 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntSessionUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authID_function_ref (session_user) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  557 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntSystemUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authID_function_ref (system_user) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  558 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentAuthID,ctInteger,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authID_function_ref (current_authid) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  559 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentCatalog,ctVarChar,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authID_function_ref (current_catalog) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  560 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentSchema,ctVarChar,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('authID_function_ref (current_schema) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  561 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentDate,ctDate,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datetime_function_ref (current date) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  562 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCurrentTime,ctTime,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datetime_function_ref (current time) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  563 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCurrentTimestamp,ctTimestamp,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datetime_function_ref (current timestamp) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  564 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntSQLState,ctVarChar,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('diagnostic_function_ref (sqlstate) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  565 : begin
@@ -3581,19 +4300,25 @@ begin
  567 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('range_variable %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  568 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cursor %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  569 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCharacter,ctChar,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (character(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  570 : begin
@@ -3601,97 +4326,129 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
          node.numVal:=1;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCharacter,ctChar,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (character) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  571 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntVarChar,ctVarChar,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (character varying(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  572 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntVarChar,ctVarChar,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (varchar(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  573 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntBit,ctBit,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (bit(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  574 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntVarBit,ctVarBit,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (bit varying(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  575 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNumeric,ctNumeric,yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (numeric(integer,integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  576 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNumeric,ctNumeric,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (numeric(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  577 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumeric,ctNumeric,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (numeric) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  578 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDecimal,ctDecimal,yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (decimal(integer,integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  579 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntDecimal,ctDecimal,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (decimal(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  580 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntDecimal,ctDecimal,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (decimal) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  581 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntInteger,ctInteger,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (integer) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  582 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntSmallInt,ctSmallInt,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (smallint) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  583 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntBigInt,ctBigInt,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (bigint) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  584 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (float(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  585 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (float) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  586 : begin
@@ -3699,7 +4456,9 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
          node.numVal:=DefaultRealSize;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (real) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  587 : begin
@@ -3707,37 +4466,49 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
          node.numVal:=DefaultDoubleSize;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (double precision) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  588 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntDate,ctDate,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (date) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  589 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTime,ctTime,yyv[yysp-2],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (time(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  590 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTime,ctTime,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (time) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  591 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTimestamp,ctTimestamp,yyv[yysp-2],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (timestamp(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  592 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTimestamp,ctTimestamp,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (timestamp) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  593 : begin
@@ -3745,13 +4516,17 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
          node.numVal:=1024;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntBlob,ctBlob,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (blob) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  594 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntBlob,ctBlob,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (blob(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  595 : begin
@@ -3759,19 +4534,25 @@ begin
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
          node.numVal:=1024;
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntClob,ctClob,node,nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (clob) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  596 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntClob,ctClob,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('datatype (clob(integer)) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  597 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('blob_length (integer) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  598 : begin
@@ -3785,25 +4566,33 @@ begin
  600 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('integer %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  601 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('real %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  602 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('string %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  603 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('blob %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  604 : begin
@@ -3811,13 +4600,19 @@ begin
          yyval:=yyv[yysp-0];
          yyval.ntype:=ntDate;
          yyval.dtype:=ctDate;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_DATE %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          try
          strToSqlDate(yylval.strVal);
          except
          (*todo raise better*)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,yyval]),vError);
+{$ENDIF}
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+{$ENDIF}
          GlobalSyntaxErrLine:=yylineno;
          GlobalSyntaxErrCol:=yycolno;
          GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -3830,13 +4625,19 @@ begin
          yyval:=yyv[yysp-0]; (*todo plus timezone*)
          yyval.ntype:=ntTime;
          yyval.dtype:=ctTime;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_TIME %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          try
          strToSqlTime(TIMEZONE_ZERO,yylval.strVal,dayCarry);
          except
          (*todo raise better*)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,yyval]),vError);
+{$ENDIF}
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+{$ENDIF}
          GlobalSyntaxErrLine:=yylineno;
          GlobalSyntaxErrCol:=yycolno;
          GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -3849,13 +4650,19 @@ begin
          yyval:=yyv[yysp-0]; (*todo plus timezone*)
          yyval.ntype:=ntTimestamp;
          yyval.dtype:=ctTimestamp;
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_TIMESTAMP %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          try
          strToSqlTimestamp(TIMEZONE_ZERO,yylval.strVal);
          except
          (*todo raise better*)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,yyval]),vError);
+{$ENDIF}
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+{$ENDIF}
          GlobalSyntaxErrLine:=yylineno;
          GlobalSyntaxErrCol:=yycolno;
          GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -3866,121 +4673,161 @@ begin
  607 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_INTERVAL %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  608 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_BITSTRING %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  609 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_STRING %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  610 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_NUM (integer) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  611 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_NUM (real) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  612 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('literal_BLOB %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  613 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (cast_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  614 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (case_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  615 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (case_shorthand_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  616 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (char_length_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  617 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (octet_length_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  618 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (trim_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  619 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (fold_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  620 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (position_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  621 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (substring_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  622 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (sequence_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  623 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('scalar_function_ref (user_function_expression) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  624 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntUserFunction,ctUnknown,yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('user_function_expression %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  625 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCast,yyv[yysp-1].dtype(*ctUnknown*),yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('cast_expression %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  626 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCase,ctUnknown,yyv[yysp-2],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('case_expression (condition list) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  627 : begin
@@ -3988,13 +4835,17 @@ begin
          node:=mkNode(GlobalParseStmt.srootAlloc,ntCaseOf,ctUnknown,nil,yyv[yysp-2]);
          linkLeftChild(node,yyv[yysp-3]); (* link after, so we use type of when_clause *)
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCase,ctUnknown,node,yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('case_expression (of + expression list) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  628 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('case_OPT_else %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  629 : begin
@@ -4004,163 +4855,215 @@ begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntWhen,ctUnknown,nil,yyv[yysp-0]); (* todo mkNode to allow mixed children types here *)
          linkLeftChild(yyval,yyv[yysp-2]); (* link after, so we use type of THEN *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('when_clause %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  631 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1]; (* todo reverse list before processing *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('when_clause_list (list,e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  632 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('when_clause_list (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  633 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntWhenType2,ctUnknown,nil,yyv[yysp-0]);    (* todo mkNode to allow mixed children types here *)
          linkLeftChild(yyval,yyv[yysp-2]); (* link after, so we use type of THEN *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('when_clause_type2 %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  634 : begin
          
          chainNext(yyv[yysp-1],yyv[yysp-0]);
          yyval:=yyv[yysp-1]; (* todo reverse list before processing *)
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('when_clause_type2_list (list,e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  635 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('when_clause_type2_list (e) %p',[yyval]),vDebug);
+{$ENDIF}
          
        end;
  636 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNullIf,ctUnknown,yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('case_shorthand_expression (nullif) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  637 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCoalesce,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('case_shorthand_expression (coalesce) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  638 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTrim,ctUnknown,yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('trim_expression (what char) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  639 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTrim,ctUnknown,nil,yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('trim_expression (char) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  640 : begin
          
          node:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimBoth,ctUnknown,0,0);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTrimWhat,ctUnknown,node,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('OPT_trim_what (char) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  641 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTrimWhat,ctUnknown,yyv[yysp-0],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('OPT_trim_what (trim_where) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  642 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntTrimWhat,ctUnknown,yyv[yysp-1],yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('OPT_trim_what (trim_where char) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  643 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimLeading,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('trim_where (LEADING) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  644 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimTrailing,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('trim_where (TRAILING) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  645 : begin
          
          yyval:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimBoth,ctUnknown,0,0);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('trim_where (BOTH) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  646 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCharLength,ctNumeric,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('character_length_expression %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  647 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntCharLength,ctNumeric,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('char_length_expression %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  648 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntOctetLength,ctNumeric,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('octet_length_expression %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  649 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntLower,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('fold_expression (LOWER) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  650 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntUpper,ctUnknown,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('fold_expression (UPPER) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  651 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntPosition,ctNumeric,yyv[yysp-3],yyv[yysp-1]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('position_expression %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  652 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSubstringFrom,ctUnknown,yyv[yysp-3],yyv[yysp-1]);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSubstring,ctUnknown,yyv[yysp-5],node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('substring_expression (FOR) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  653 : begin
          
          node:=mkNode(GlobalParseStmt.srootAlloc,ntSubstringFrom,ctUnknown,yyv[yysp-1],nil);
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSubstring,ctUnknown,yyv[yysp-3],node);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('substring_expression %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  654 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntNextSequence,ctNumeric,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('sequence_expression (next) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  655 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntLatestSequence,ctNumeric,yyv[yysp-1],nil);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('sequence_expression (latest) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  656 : begin
@@ -4171,7 +5074,9 @@ begin
  657 : begin
          
          yyval:=yyv[yysp-0];
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('user %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  658 : begin
@@ -4358,7 +5263,9 @@ begin
  707 : begin
          
          yyval:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,yyv[yysp-0]);
+{$IFDEF Debug_Log}
          log.add(yywho,yywhere,format('schema (identifier) %p, yylval=%p',[yyval,yylval]),vDebug);
+{$ENDIF}
          
        end;
  708 : begin

@@ -330,26 +330,36 @@ sql_list:
   {
   $$:=$1;
   GlobalParseRoot:=$$;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_list (sql) %p',[$$]),vDebug);
+{$ENDIF}
   yyaccept;
   }
   | pSEMICOLON
   {
   GlobalParseRoot:=nil;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_list (;) %p',[$$]),vDebug);
+{$ENDIF}
   yyaccept;
   }
   | /* nothing */
   {
   GlobalParseRoot:=nil;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nothing %p',[$$]),vDebug);
+{$ENDIF}
   yyaccept;
   }
   | error
   {
   (* $$:=$1; *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,$$]),vError);
+{$ENDIF}
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+{$ENDIF}
   GlobalSyntaxErrLine:=yylineno;
   GlobalSyntaxErrCol:=yycolno;
   GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -365,7 +375,9 @@ sql_compound:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundBlock,ctUnknown,$4,$3);
   if $1<>nil then begin $$.idVal:=$1.idVal; deleteSyntaxTree($1); end;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound (block) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_compound_label kwWHILE cond_exp kwDO
   OPT_sql_compound_list
@@ -373,7 +385,9 @@ sql_compound:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundWhile,ctUnknown,$5,$3);
   if $1<>nil then begin $$.idVal:=$1.idVal; deleteSyntaxTree($1); end;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound (while) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwIF condition_then_action
   OPT_elseif_condition_then_action_list
@@ -382,7 +396,9 @@ sql_compound:
   {
   chainAppendNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundIf,ctUnknown,$2,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound (if) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_compound_label kwLOOP
   OPT_sql_compound_list
@@ -390,7 +406,9 @@ sql_compound:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundLoop,ctUnknown,$3,nil);
   if $1<>nil then begin $$.idVal:=$1.idVal; deleteSyntaxTree($1); end;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound (loop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_compound_label kwREPEAT
   OPT_sql_compound_list
@@ -399,7 +417,9 @@ sql_compound:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundRepeat,ctUnknown,$3,$5);
   if $1<>nil then begin $$.idVal:=$1.idVal; deleteSyntaxTree($1); end;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound (repeat) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCASE
   OPT_when_condition_then_action_list
@@ -407,7 +427,9 @@ sql_compound:
   kwEND kwCASE
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundCase,ctUnknown,$2,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound (case) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -423,12 +445,16 @@ atomicity:
   kwNOT kwATOMIC
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntNotAtomic,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('atomicity (not atomic) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwATOMIC
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntAtomic,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('atomicity (atomic) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -437,7 +463,9 @@ condition_then_action:
   cond_exp kwTHEN sql_compound_list
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntIfThen,ctUnknown,$1,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('condition_then_action %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -453,12 +481,16 @@ elseif_condition_then_action_list:
   {
   chainAppendNext($1,$2);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('elseif_condition_then_action_list (list,e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | elseif_condition_then_action
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('elseif_condition_then_action_list (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -473,7 +505,9 @@ else_action:
   kwELSE sql_compound_list
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('else_action %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -496,12 +530,16 @@ when_condition_then_action_list:
   {
   chainAppendNext($1,$2);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_condition_then_action_list (list,e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | when_condition_then_action
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_condition_then_action_list (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -517,12 +555,16 @@ sql_compound_element:
   sql pSEMICOLON
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundElement,ctUnknown,$1,nil); (* wrapped to allow separate tree deletion without breaking chain *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound_element (sql ;) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | sql_compound pSEMICOLON
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCompoundElement,ctUnknown,$1,nil); (* wrapped to allow separate tree deletion without breaking chain *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound_element (sql_compound ;) %p',[$$]),vDebug);
+{$ENDIF}
   }
   /* note no yyaccept here - otherwise keep same as sql_list */
   ;
@@ -532,12 +574,16 @@ sql_compound_list:
   {
   chainAppendNext($1,$2);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound_list (list,e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | sql_compound_element
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sql_compound_list (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -582,47 +628,65 @@ connection:
   connect
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (connect) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | disconnect
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (disconnect) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | set_schema
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (set schema) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | commit
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (commit) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | rollback
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (commit) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | set_transaction
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (set transaction) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | set_constraints
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (set constraints) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSHOWTRANS
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntSHOWTRANS,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (SHOWTRANS) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSHUTDOWN
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntSHUTDOWN,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connection (SHUTDOWN) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -630,112 +694,156 @@ implementation_defined:
   catalog_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (catalog_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | user_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (user_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | user_alteration
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (user_alteration) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | user_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (user_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | index_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (index_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | index_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (index_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | sequence_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (sequence_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | sequence_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (sequence_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | debug_table
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (debug_table) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | debug_index
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (debug_index) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | debug_catalog
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (debug_catalog) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | debug_server
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (debug_server) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | debug_page
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (debug_page) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | debug_plan
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (debug_plan) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | debug_print
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (debug_print) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kill_tran
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (kill) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | cancel_tran
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (cancel) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | rebuild_index
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (rebuild_index) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | catalog_backup
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (catalog_backup) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | catalog_open
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (catalog_open) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | catalog_close
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (catalog_close) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | catalog_garbage_collect
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined (catalog_garbage_collect) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -743,37 +851,51 @@ ddl:
   base_table_alteration
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('ddl (base_table_alteration) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | schema_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('ddl (schema_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | domain_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('ddl (domain_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | base_table_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('ddl (base_table_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | view_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('ddl (view_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | routine_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('ddl (routine_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | authorization_drop
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('ddl (authorization_drop) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -781,79 +903,109 @@ dml:
   table_exp    /* select_exp 080699 made more general */
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (table_exp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table_exp
   table_exp_OPT_orderby
   {
   $$:=$1;
   chainNext($$,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (table_exp order by) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | insert
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (insert) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | searched_update
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (searched_update) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | searched_delete
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (searched_delete) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | call_routine
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (call_routine) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | declaration
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (declaration) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | open
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (open) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | close
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (close) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | fetch
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (close) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | assignment
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (assignment) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | return
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (return) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | leave
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (leave) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | iterate
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (iterate) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | single_row_select
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('dml (single_row_select) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -866,7 +1018,9 @@ catalog_def:
   kwCREATE kwCATALOG catalog
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateCatalog,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('catalog_def %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -874,7 +1028,9 @@ user_def:
   kwCREATE kwUSER user OPT_password
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateUser,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('user_def %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -882,7 +1038,9 @@ user_alteration:
   kwALTER kwUSER user user_alteration_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAlterUser,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('user_alteration %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -903,7 +1061,9 @@ user_drop:
   drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropUser,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('user_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -912,7 +1072,9 @@ index_def:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateIndex,ctUnknown,$3,$5);
   chainNext($$,$7);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('index_def %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -920,7 +1082,9 @@ sequence_def:
   kwCREATE kwSEQUENCE sequence OPT_starting_at
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateSequence,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sequence_def %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -929,7 +1093,9 @@ sequence_drop:
   drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropSequence,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sequence_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -938,7 +1104,9 @@ index_drop:
   index
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropIndex,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('index_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -946,7 +1114,9 @@ debug_table:
   kwDEBUG kwTABLE OPT_summary base_table_OR_view
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGTABLE,ctUnknown,$4,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('debug_table (debug table...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -954,7 +1124,9 @@ debug_index:
   kwDEBUG kwINDEX OPT_summary base_table_OR_view
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGINDEX,ctUnknown,$4,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('debug_index (debug index...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -962,7 +1134,9 @@ debug_catalog:
   kwDEBUG kwCATALOG OPT_summary catalog
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGCATALOG,ctUnknown,$4,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('debug_catalog (debug catalog...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -970,7 +1144,9 @@ debug_server:
   kwDEBUG kwSERVER OPT_summary
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGSERVER,ctUnknown,nil,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('debug_server (debug server...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -978,7 +1154,9 @@ debug_page:
   kwDEBUG kwPAGE OPT_summary integer
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGPAGE,ctUnknown,$4,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('debug_page (debug page...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -986,7 +1164,9 @@ debug_plan:
   kwDEBUG kwPLAN OPT_summary lit_param_or_var
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGPLAN,ctUnknown,$4,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('debug_plan (debug plan...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -994,7 +1174,9 @@ debug_print:
   kwDEBUG kwPRINT scalar_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDEBUGPRINT,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('debug_print (debug print...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1018,7 +1200,9 @@ kill_tran:
   kwKILL lit_param_or_var
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntKillTran,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('kill_tran %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1026,7 +1210,9 @@ cancel_tran:
   kwCANCEL lit_param_or_var
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCancelTran,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cancel_tran %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1034,7 +1220,9 @@ rebuild_index:
   kwREBUILD kwINDEX base_table_OR_view index
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntREBUILDINDEX,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('rebuild_index (rebuild index...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1042,7 +1230,9 @@ catalog_backup:
   kwBACKUP kwCATALOG kwTO catalog
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntBackupCatalog,ctUnknown,$4,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('catalog_backup %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1050,7 +1240,9 @@ catalog_open:
   kwOPEN kwCATALOG catalog
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOpenCatalog,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('catalog_open %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1058,7 +1250,9 @@ catalog_close:
   kwCLOSE kwCATALOG catalog
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCloseCatalog,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('catalog_close %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1066,7 +1260,9 @@ catalog_garbage_collect:
   kwGARBAGE kwCOLLECT kwCATALOG catalog
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntGarbageCollectCatalog,ctUnknown,$4,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('catalog_garbage_collect %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1074,7 +1270,9 @@ index:
   tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntIndex,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('index (identifier) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
 
 sequence:
@@ -1083,18 +1281,24 @@ sequence:
   node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,$1);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSequence,ctUnknown,node,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sequence (catalog.schema.sequence) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT tIDENTIFIER
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$1);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSequence,ctUnknown,node,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sequence (schema.sequence) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSequence,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sequence (sequence) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1110,12 +1314,16 @@ connect:
   chainNext(node,$5);
   chainNext(node,$4);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConnect,ctUnknown,$3,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connect %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCONNECT kwTO kwDEFAULT
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConnect,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connect (to default) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1123,22 +1331,30 @@ disconnect:
   kwDISCONNECT lit_param_or_var
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('disconnect %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDISCONNECT kwDEFAULT
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connect (default) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDISCONNECT kwCURRENT    /* Note: currently behaves as DEFAULT */
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connect (current) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDISCONNECT kwALL    /* Note: currently behaves as DEFAULT */
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDisconnect,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('connect (all) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1146,12 +1362,16 @@ set_schema:                /* Note: dynamic SQL use only */
   kwSET kwSCHEMA lit_param_or_var
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSetSchema,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('set_schema %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSET kwSCHEMA authID_function_ref
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSetSchema,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('set_schema %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1160,7 +1380,9 @@ commit:
   kwCOMMIT OPT_work
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCommit,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('commit %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1168,7 +1390,9 @@ rollback:
   kwROLLBACK OPT_work
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntRollback,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('rollback %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1176,7 +1400,9 @@ set_transaction:
   kwSET kwTRANSACTION option_commalist
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSetTransaction,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('set_transaction %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1185,12 +1411,16 @@ option_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option_commalist (e,list) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | option
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1198,37 +1428,51 @@ option:
   kwDIAGNOSTIC kwSIZE integer
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOptionDiagnostic,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (diagnostic size) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwREAD kwONLY
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOptionReadOnly,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (read only) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwREAD kwWRITE
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOptionReadWrite,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (read write) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwISOLATION kwLEVEL kwREAD kwUNCOMMITTED
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationReadUncommitted,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (isolation read uncommitted) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwISOLATION kwLEVEL kwREAD kwCOMMITTED
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationReadCommitted,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (isolation read committed) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwISOLATION kwLEVEL kwREPEATABLE kwREAD
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationRepeatableRead,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (isolation repeatable read) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwISOLATION kwLEVEL kwSERIALIZABLE
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOptionIsolationSerializable,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('option (isolation serializable) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1247,7 +1491,9 @@ schema_def:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateSchema,ctUnknown,nil,$7);
   chainNext($$,$6);
   chainNext($$,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_def authorization %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCREATE kwSCHEMA schema OPT_authorization
   OPT_default_character_set
@@ -1256,7 +1502,9 @@ schema_def:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateSchema,ctUnknown,$3,$6);
   chainNext($$,$5);
   chainNext($$,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_def %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1264,37 +1512,51 @@ schema_element:
   domain_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_element (domain_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | base_table_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_element (base_table_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | view_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_element (view_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | routine_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_element (routine_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | authorization_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_element (authorization_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | index_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined schema_element (index_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | sequence_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('implementation_defined schema_element (sequence_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1304,12 +1566,16 @@ schema_element_list:
   {
   chainAppendNext($1,$2);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_element_list (list,e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | schema_element
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_element_list (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1325,7 +1591,9 @@ default_def:
   kwDEFAULT default_def_ONE_type
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDefault,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('default_def %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1362,7 +1630,9 @@ domain_def:
   chainNext($5,$7);
   chainNext($5,$6);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateDomain,ctUnknown,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('domain_def (create domain...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1383,7 +1653,9 @@ base_table_def:
   chainNext($4,$8);
   chainNext($4,$2);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateTable,ctUnknown,$4,$6);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_def (create table...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1391,12 +1663,16 @@ base_table_def_OPT_temp:
   kwGLOBAL kwTEMPORARY
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntGlobalTemporary,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_def_OPT_temp (global temporary) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwLOCAL kwTEMPORARY
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntLocalTemporary,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_def_OPT_temp (local temporary) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -1405,12 +1681,16 @@ base_table_def_OPT_commit:
   kwON kwCOMMIT kwDELETE kwROWS
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntOnCommitDelete,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_def_OPT_commit (on commit delete rows) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwON kwCOMMIT kwPRESERVE kwROWS
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntOnCommitPreserve,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_def_OPT_commit (on commit preserve rows) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -1419,12 +1699,16 @@ base_table_element:
   column_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_element (column_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | base_table_constraint_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_element (base_table_constraint_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1433,12 +1717,16 @@ base_table_element_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_element_commalist (e,list) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | base_table_element
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_element_commalist (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1448,14 +1736,18 @@ column_def:
   chainNext($2,$4);
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntColumnDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_def (column datatype...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | column domain column_def_OPT_default column_def_OPT_constraint
   {
   chainNext($2,$4);
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntColumnDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_def (column domain...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1485,7 +1777,9 @@ view_def:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateView,ctUnknown,$3,$6);
   if check_start_text<>'' then  (* store view definition (has leading NAME AS and trailing LEXEME which we remove) *)
     $$.strVal:=copy(check_start_text,1,yyoffset-check_start_at -length(yytext));
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('view_def (create view...) %p is at %d,%d (%d,%d %s)',[$$,yylineNo,yycolno,check_start_at,yyoffset,$$.strVal]),vDebug);
+{$ENDIF}
   check_start_text:='';
   }
   ;
@@ -1494,7 +1788,9 @@ view_def_OPT_with:
   kwWITH view_def_OPT_with_OPT_type kwCHECK kwOPTION
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntWithCheckOption,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('view_def_OPT_with (with check option) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -1528,7 +1824,9 @@ routine_def:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCreateRoutine,ctUnknown,$3,$8);
   if check_start_text<>'' then  (* store routine definition (has leading NAME AS and trailing LEXEME which we remove) *)
     $$.strVal:=copy(check_start_text,1,yyoffset-check_start_at -length(yytext));
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine_def (create procedure/function...) %p is at %d,%d (%d,%d %s)',[$$,yylineNo,yycolno,check_start_at,yyoffset,$$.strVal]),vDebug);
+{$ENDIF}
   check_start_text:='';
   }
   ;
@@ -1538,12 +1836,16 @@ routine_parameter_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine_parameter_commalist (e,list) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | routine_parameter_def
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine_parameter_commalist (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1562,7 +1864,9 @@ routine_parameter_def:
   chainNext($3,$1);
   chainNext($3,$4);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntParameterDef,ctUnknown,$2,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine_parameter_def (routine_parameter datatype...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1574,7 +1878,9 @@ routine_def_OPT_returns:
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntId,ctUnknown,0,0);
   node.idVal:=FunctionReturnParameterName;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntParameterDef,ctUnknown,node,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine_def_OPT_returns (returns) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -1591,17 +1897,23 @@ direction:
   kwIN
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntIn,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('direction (in) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwOUT
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntOut,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('direction (out) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwINOUT
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntInOut,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('direction (inout) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1628,13 +1940,17 @@ declaration:
   chainNext($2,$6);
   chainNext($2,$10);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCursorDeclaration,ctUnknown,$2,$8);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('declaration cursor %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDECLARE column_commalist datatype OPT_default_def
   {
   chainNext($3,$4);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDeclaration,ctUnknown,$2,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('declaration %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1706,7 +2022,9 @@ open:
   kwOPEN cursor
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOpen,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('open %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1714,7 +2032,9 @@ close:
   kwCLOSE cursor
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntClose,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('close %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1725,7 +2045,9 @@ fetch:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntFetch,ctUnknown,$2,$3);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntInto,ctUnknown,$5,nil);
   chainNext($$,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('fetch %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1765,7 +2087,9 @@ assignment:
   kwSET update_assignment
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAssignment,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('assignment %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1773,7 +2097,9 @@ return:
   kwRETURN scalar_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntReturn,ctUnknown,nil,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('return %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1781,7 +2107,9 @@ leave:
   kwLEAVE compound_label_end
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntLeave,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('leave %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1789,7 +2117,9 @@ iterate:
   kwITERATE compound_label_end
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntIterate,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('iterate %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1801,7 +2131,9 @@ authorization_def:
   chainNext($4,$2);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntGrant,ctUnknown,$4,$6);
   chainNext($$,$7);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authorization_def (grant...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1810,27 +2142,37 @@ deferrability:
   kwINITIALLY kwDEFERRED OPT_deferrable
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyDeferred,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('deferrability (initially deferred...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | deferrable kwINITIALLY kwDEFERRED
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyDeferred,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('deferrability (...initially deferred) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwINITIALLY kwIMMEDIATE OPT_deferrable
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyImmediate,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('deferrability (initially immediate...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | deferrable kwINITIALLY kwIMMEDIATE
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyImmediate,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('deferrability (...initially immediate) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | deferrable
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntInitiallyImmediate,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('deferrability (...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1846,12 +2188,16 @@ deferrable:
   kwNOT kwDEFERRABLE
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntNotDeferrable,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('deferrable (not deferrable) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDEFERRABLE
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntDeferrable,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('deferrable (deferrable) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1859,7 +2205,9 @@ privilege_commalist_or_all:
   kwALL kwPRIVILEGES
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntAllPrivileges,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege_commalist_or_all (all privileges) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | privilege_commalist
   {
@@ -1872,12 +2220,16 @@ privilege_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege_commalist (e,list) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | privilege
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1885,37 +2237,51 @@ privilege:
   kwSELECT OPT_column_commalist /* SQL-99 allows OPT_column_commalist here */
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeSelect,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (select) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwINSERT OPT_column_commalist
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeInsert,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (insert) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwUPDATE OPT_column_commalist
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeUpdate,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (update) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDELETE
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeDelete,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (delete) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwREFERENCES OPT_column_commalist
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeReferences,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (references) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwUSAGE
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeUsage,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (usage) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwEXECUTE
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPrivilegeExecute,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('privilege (execute) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1923,47 +2289,65 @@ accessible_object:
   kwDOMAIN domain
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (domain) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwTABLE table
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (TABLE table) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCHARACTER kwSET character_set
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCharacterSet,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (character_set) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCOLLATION collation
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCollation,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (collation) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwTRANSLATION translation
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTranslation,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (translation) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwROUTINE routine
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (ROUTINE routine) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwPROCEDURE routine
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (PROCEDURE routine) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwFUNCTION routine
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (FUNCTION routine) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('accessible_object (table) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1972,12 +2356,16 @@ grantee_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('grantee_commalist (e,list) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | grantee
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('grantee_commalist (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -1996,7 +2384,9 @@ authorization_def_OPT_with:
   kwWITH kwGRANT kwOPTION
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntWithGrantOption,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authorization_def_OPT_with (with grant option) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -2006,7 +2396,9 @@ base_table_alteration:
   base_table_alteration_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAlterTable,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_alteration %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2019,17 +2411,23 @@ column_alteration_action:
   kwADD OPT_column column_def
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAddColumn,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_alteration_action (add column) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwALTER OPT_column column column_alteration_alter_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAlterColumn,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_alteration_action (alter column) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDROP OPT_column column drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropColumn,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_alteration_action (drop column) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2048,12 +2446,16 @@ base_table_constraint_alteration_action:
   kwADD base_table_constraint_def
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAddConstraint,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_constraint_alteration_action (add constraint) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDROP kwCONSTRAINT constraint drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropConstraint,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_constraint_alteration_action (drop constraint) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2063,7 +2465,9 @@ schema_drop:
   drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropSchema,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2073,7 +2477,9 @@ domain_drop:
   drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropDomain,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('domain_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2083,7 +2489,9 @@ base_table_drop:
   drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropTable,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2093,7 +2501,9 @@ view_drop:
   drop_referential_action
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropView,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('view_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2103,7 +2513,9 @@ routine_drop:
   {
   chainNext($3,$2);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDropRoutine,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine_drop %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2127,7 +2539,9 @@ authorization_drop:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRevoke,ctUnknown,$5,$7);
   chainNext($$,$8);
   chainNext($$,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authorization_drop (revoke...) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2135,7 +2549,9 @@ authorization_drop_OPT_for:
   kwGRANT kwOPTION kwFOR
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntWithGrantOption,ctUnknown,0,0);    //we re-use syntax node
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authorization_drop_OPT_for (grant option for) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -2158,7 +2574,9 @@ insert:
     insert_OPT_values
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntInsert,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('insert %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2179,7 +2597,9 @@ searched_update:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntUpdate,ctUnknown,$2,$5);
   chainNext($$,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('searched_update %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2187,12 +2607,16 @@ update_assignment:
   column pEQUAL kwDEFAULT
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntUpdateAssignment,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('update_assignment (column=DEFAULT) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | column pEQUAL scalar_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntUpdateAssignment,ctUnknown,$1,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('update_assignment (column=scalar_exp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2212,7 +2636,9 @@ searched_delete:
   kwDELETE kwFROM table_OPT_as_range select_exp_OPT_where
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDelete,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('searched_delete %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2220,7 +2646,9 @@ table_exp_OPT_orderby:
   kwORDER kwBY order_item_commalist
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOrderBy,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_exp_OPT_orderby %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -2229,13 +2657,19 @@ order_item:
   column_ref OPT_ascdesc
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOrderItem,$1.dtype(*ctUnknown*),$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('order_item (column) %p',[$$]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('  $1.dtype=%d',[ord($1.dtype)]),vDebug);
+{$ENDIF}
   }
   | integer OPT_ascdesc     /* Note: deprecated */
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOrderItem,$1.dtype(*ctUnknown*),$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('order_item (integer) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2255,7 +2689,9 @@ call_routine:
   kwCALL routine pLPAREN OPT_scalar_exp_commalist pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCallRoutine,ctUnknown,$2,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('call_routine (call) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2279,7 +2715,9 @@ join_table_exp:
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntCrossJoin,ctUnknown,$4,$1);   
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntJoinTableExp,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('join_table_exp (table_ref cross join table_ref) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table_ref OPT_natural join_table_exp_OPT_jointype kwJOIN table_ref
     join_table_exp_OPT_onusing
@@ -2292,12 +2730,16 @@ join_table_exp:
   chainNext(node,$2);
   chainNext(node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntJoinTableExp,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('join_table_exp (table_ref [natural] [join type] join table_ref [on/using...]) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pLPAREN join_table_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntJoinTableExp,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('join_table_exp (join_table_ref) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2322,17 +2764,23 @@ table_ref:
   join_table_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTableRef,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_ref (join_table_exp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table table_ref_ascolumn
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTableRef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_ref (table [as]) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTableRef,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_ref (table) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pLPAREN table_exp pRPAREN OPT_as range_variable OPT_column_commalist
   {
@@ -2343,7 +2791,9 @@ table_ref:
   | pLPAREN table_exp pRPAREN table_ref_ascolumn
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTableRef,ctUnknown,$2,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_ref ((table_exp) [as]) %p',[$$]),vDebug);
+{$ENDIF}
   }
 */
   ;
@@ -2371,12 +2821,16 @@ table_ref_commalist:
   table_ref_commalist pCOMMA table_ref  
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCrossJoin,ctUnknown,$1,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_ref_commalist (list,e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table_ref
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCrossJoin,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_ref_commalist (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2407,7 +2861,9 @@ nonjoin_table_exp:
   nonjoin_table_term
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableExp,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_exp (nonjoin_table_term) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table_exp ONE_unionexcept OPT_all
     nonjoin_table_exp_OPT_corresponding
@@ -2418,7 +2874,9 @@ nonjoin_table_exp:
   chainNext(node,$3);
   chainNext(node,$2);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableExp,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_exp (table_exp [union/except] [all] [corresponding...] table_term) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2438,7 +2896,9 @@ nonjoin_table_term:
   nonjoin_table_primary
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableTerm,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_term (nonjoin_table_primary) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table_term kwINTERSECT OPT_all
     nonjoin_table_exp_OPT_corresponding
@@ -2448,7 +2908,9 @@ nonjoin_table_term:
   chainNext(node,$4);
   chainNext(node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTableTerm,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_term (table_term intersect [all] [corresponding...] table_primary) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2478,22 +2940,30 @@ nonjoin_table_primary:
   pLPAREN nonjoin_table_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_primary ( (nonjoin_table_exp) ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | select_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_primary ( select_exp ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwTABLE table
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_primary ( TABLE table ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | table_constructor
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNonJoinTablePrimary,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('nonjoin_table_primary ( table_constructor ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2501,7 +2971,9 @@ table_constructor:
   kwVALUES row_constructor_commalist
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTableConstructor,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table_constructor %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2510,19 +2982,25 @@ row_constructor:
   pLPAREN scalar_exp_commalist pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor ( scalar_exp_commalist ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   /* not needed? above covers it? */
   | pLPAREN table_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor ( table_exp ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | scalar_exp
   {
   //Note: moving this below the other 2 reduce the conflicts enormously! - not sure any more...
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor (scalar_exp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2531,17 +3009,23 @@ row_constructor:
   scalar_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor (scalar_exp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pLPAREN scalar_exp_commalist pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor ( scalar_exp_commalist ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pLPAREN table_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor ( table_exp ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 */
@@ -2550,12 +3034,16 @@ row_constructor_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor_commalist ( rc,rcclist ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | row_constructor
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('row_constructor_commalist ( rc ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2572,8 +3060,12 @@ select_exp:
   chainNext($$,$8);
   chainNext($$,$7);
   chainNext($$,$6);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('select_exp %p',[$$]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('  $$.dtype=%d',[ord($$.dtype)]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2581,7 +3073,9 @@ select_exp_OPT_where:
   kwWHERE cond_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntWhere,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('select_exp_OPT_where %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -2618,18 +3112,26 @@ select_item:
   scalar_exp select_item_OPT_ascolumn
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSelectItem,$1.dtype(*ctUnknown*),$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('select_item (scalar_exp [as...]) %p',[$$]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('  $1.dtype=%d',[ord($1.dtype)]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT pASTERISK
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSelectAll,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('select_item (range.*) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pASTERISK
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSelectAll,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('select_item (*) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2637,7 +3139,9 @@ select_item_OPT_ascolumn:
   OPT_as column
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('select_item_OPT_ascolumn %p',[$$]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -2665,8 +3169,12 @@ single_row_select:
   chainNext($$,$10);
   chainNext($$,$9);
   chainNext($$,$8);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('single_row_select %p',[$$]),vDebug);
+{$ENDIF}
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('  $$.dtype=%d',[ord($$.dtype)]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2690,12 +3198,16 @@ cond_exp:
   cond_term
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_exp (t) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | cond_exp kwOR cond_term
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOR,ctUnknown,$1,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_exp (e OR t) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2703,12 +3215,16 @@ cond_term:
   cond_factor
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_term (f) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | cond_term kwAND cond_factor
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAND,ctUnknown,$1,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_term (t AND f) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2716,12 +3232,16 @@ cond_factor:
   cond_test
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_factor (cond_test) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwNOT cond_test
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_factor (NOT cond_test) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2732,7 +3252,9 @@ cond_test:
   if $2=nil then
   begin
     $$:=$1;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('cond_test %p',[$$]),vDebug);
+{$ENDIF}
   end
   else
   begin
@@ -2741,7 +3263,9 @@ cond_test:
     else
       linkLeftChild($2,$1);
     $$:=$2;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('cond_test (cond_primary IS/IS NOT) %p',[$$]),vDebug);
+{$ENDIF}
   end;
   }
   ;
@@ -2753,12 +3277,16 @@ cond_test_OPT_is:
   if $2=nil then
   begin
     $$:=node;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('is... %p',[$$]),vDebug);
+{$ENDIF}
   end
   else
   begin
     $$:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('is NOT... %p',[$$]),vDebug);
+{$ENDIF}
   end;
   }
   | /* nothing */ {$$:=nil;}
@@ -2783,12 +3311,16 @@ cond_primary:
   simple_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_primary (simple_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pLPAREN cond_exp pRPAREN
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cond_primary ( (cond_exp) ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2796,47 +3328,65 @@ simple_cond:
   all_or_any_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (all_or_any) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | comparison_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (comparison_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | between_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (between_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | like_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (like_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | in_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (in_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | match_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (match_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | exists_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (exists_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | unique_cond
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (unique_cond) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | test_for_null
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('simple_cond (test_for_null) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2846,7 +3396,9 @@ comparison_cond:
   linkLeftChild($2,$1);
   linkRightChild($2,$3);
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('comparison_cond %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2854,32 +3406,44 @@ comparison_operator:
   pEQUAL
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntEqual,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('comparison_operator (=) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pLT
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntLT,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('comparison_operator (<) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pLTEQ
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntLTEQ,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('comparison_operator (<=) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pGT
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntGT,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('comparison_operator (>) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pGTEQ
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntGTEQ,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('comparison_operator (>=) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pNOTEQUAL
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNotEqual,ctUnknown,nil,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('comparison_operator (<>) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -2893,12 +3457,16 @@ between_cond:
   if $2=nil then
   begin
     $$:=node;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('between_cond %p',[$$]),vDebug);
+{$ENDIF}
   end
   else
   begin
     $$:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('between_cond (NOT) %p',[$$]),vDebug);
+{$ENDIF}
   end;
   }
   ;
@@ -2919,7 +3487,9 @@ like_cond:
     begin
       node:=mkNode(GlobalParseStmt.srootAlloc,ntRowConstructor,ctUnknown,$4,nil);
       node:=mkNode(GlobalParseStmt.srootAlloc,ntEqual,ctUnknown,$1,node);
+{$IFDEF Debug_Log}
       log.add(yywho,yywhere,format('like_cond optimised to =%s %p',[$4.leftChild.strVal,$$]),vDebug);
+{$ENDIF}
     end;
   end
   else
@@ -2928,12 +3498,16 @@ like_cond:
   if $2=nil then
   begin
     $$:=node;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('like_cond %p DEBUG:%d',[$$,ord($4.leftChild.nType)]),vDebug);
+{$ENDIF}
   end
   else
   begin
     $$:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('like_cond (NOT) %p',[$$]),vDebug);
+{$ENDIF}
   end;
   }
   ;
@@ -2952,14 +3526,18 @@ in_cond:
   if $2=nil then
   begin
     $$:=node;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('in_cond %p',[$$]),vDebug);
+{$ENDIF}
   end
   else
   begin
     //Note: the way we convert NOT IN -> NOT(IN)
     //may not always be exactly correct for tuples: see Page 242/243?
     $$:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('in_cond (NOT) %p',[$$]),vDebug);
+{$ENDIF}
   end;
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntAny,ctUnknown,0,0);
   chainNext($5,node);
@@ -2972,14 +3550,18 @@ in_cond:
   if $2=nil then
   begin
     $$:=node;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('in_cond (scalar) %p',[$$]),vDebug);
+{$ENDIF}
   end
   else
   begin
     //Note: the way we convert NOT IN -> NOT(IN)
     //may not always be exactly correct for tuples: see Page 242/243?
     $$:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('in_cond (scalar) (NOT) %p',[$$]),vDebug);
+{$ENDIF}
   end;
   }
   ;
@@ -2991,7 +3573,9 @@ match_cond:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntMatch,ctUnknown,$1,$6);
   chainNext($6,$3);
   chainNext($6,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('match_cond %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3003,7 +3587,9 @@ all_or_any_cond:
   linkRightChild($2,$5);
   chainNext($5,$3);
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('all_or_any_cond %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3011,17 +3597,23 @@ all_or_any_cond_ONE_op:
   kwALL
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntAll,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('all %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwANY
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntAny,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('any %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSOME
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntAny,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('some (=any) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3029,7 +3621,9 @@ exists_cond:
   kwEXISTS pLPAREN table_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntExists,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('exists_cond %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3037,7 +3631,9 @@ unique_cond:
   kwUNIQUE pLPAREN table_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntIsUnique,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('unique_cond %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3052,14 +3648,18 @@ test_for_null:
   if $3=nil then
   begin
     $$:=node;
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('test_for_null (IS) %p',[$$]),vDebug);
+{$ENDIF}
   end
   else
   begin
     //Note: the way we convert IS NOT NULL -> NOT(IS NULL)
     //is not always exactly correct for tuples: see Page 242/243
     $$:=mkNode(GlobalParseStmt.srootAlloc,ntNOT,ctUnknown,node,nil);
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('test_for_null (IS NOT) %p',[$$]),vDebug);
+{$ENDIF}
   end;
   }
   ;
@@ -3074,21 +3674,27 @@ base_table_constraint_def:
   {
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_constraint_def (candidate_key_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_constraint
     foreign_key_def OPT_deferrability
   {
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_constraint_def (foreign_key_def) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_constraint
     check_constraint_def OPT_deferrability
   {
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_constraint_def (check) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3192,7 +3798,9 @@ check_constraint_def:
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntCondExpText,ctVarChar,0,0);
   node.strVal:=copy(check_start_text,1,yyoffset-check_start_at);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCheckConstraint,ctUnknown,$3,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('check_constraint_def text is at %d,%d (%d,%d %s)',[yylineNo,yycolno,check_start_at,yyoffset,node.strVal]),vDebug);
+{$ENDIF}
   check_start_text:='';
   }
   ;
@@ -3204,21 +3812,27 @@ column_constraint_def:
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNotNull,ctUnknown,0,0);
   chainNext(node,$4);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_constraint_def (not null) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_constraint kwPRIMARY kwKEY OPT_deferrability
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntPrimaryKey,ctUnknown,0,0);
   chainNext(node,$4);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_constraint_def (primary key) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_constraint kwUNIQUE OPT_deferrability
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntUnique,ctUnknown,0,0);
   chainNext(node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_constraint_def (unique) %p',[$$]),vDebug);
+{$ENDIF}
   }
   /* note: what about foreign_key_def ? should be inserted before references_def below
     -> error in SQL4? p405 - I don't think so, table constraints have column lists..
@@ -3228,14 +3842,18 @@ column_constraint_def:
   {
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_constraint_def (references) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | OPT_constraint
     check_constraint_def OPT_deferrability
   {
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_constraint_def (check) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3257,7 +3875,9 @@ domain_constraint_def:
   {
   chainNext($2,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraintDef,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_constraint_def (check) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3266,12 +3886,16 @@ constraint_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('constraint_commalist (e,list) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | constraint
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('constraint_commalist (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3279,12 +3903,16 @@ set_constraints:
   kwSET kwCONSTRAINTS kwALL ONE_deferredimmediate
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSetConstraints,ctUnknown,nil,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('set_constraints (ALL) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSET kwCONSTRAINTS constraint_commalist ONE_deferredimmediate
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSetConstraints,ctUnknown,$3,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('set_constraints (constraint_commalist) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3296,7 +3924,9 @@ scalar_exp:
   generic_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNumericExp,ctUnknown (*debug CASE? but broke group-by tests: ctFloat*),$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_exp (generic_exp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3305,12 +3935,16 @@ scalar_exp_commalist:
   {
   chainNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_exp_commalist (se,seclist) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | scalar_exp
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_exp_commalist (se) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3326,12 +3960,16 @@ scalar_exp_commalist_literal_order:
   {
   chainAppendNext($1,$3);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_exp_commalist_literal_order (se,seclist) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | scalar_exp
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_exp_commalist_literal_order (se) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3339,19 +3977,25 @@ generic_exp:
   generic_term
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_exp (generic_term) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | generic_exp ONE_plusminus generic_term
   {
   linkLeftChild($2,$1);
   linkRightChild($2,$3);
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_exp (generic_exp +- generic_term) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | generic_concatenation
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_exp (generic_concatenation) %p',[$$]),vDebug);
+{$ENDIF}
   }
   /* todo (date - date) start to end - see CH17 - dynamic only? */
   ;
@@ -3360,20 +4004,26 @@ generic_term:
   generic_factor
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_term (generic_factor) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | generic_term ONE_multdiv generic_factor
   {
   linkLeftChild($2,$1);
   linkRightChild($2,$3);
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_term (generic_term /* generic_factor) %p',[$$]),vDebug);
+{$ENDIF}
   }
 /*
   | generic_primary / datetime_term_OPT_atzone  todo record opt atzone /
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_term (generic_primary) %p',[$$]),vDebug);
+{$ENDIF}
   }
 */
   ;
@@ -3392,7 +4042,9 @@ generic_factor:
   node.numVal:=0;
   node.nullVal:=false;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntMinus,ctUnknown,node,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_factor (- generic_primary) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | pPLUS generic_primary
   {
@@ -3400,12 +4052,16 @@ generic_factor:
   node.numVal:=0;
   node.nullVal:=false;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPlus,ctUnknown,node,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_factor (+ generic_primary) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | generic_primary
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_factor (generic_primary) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3419,19 +4075,25 @@ generic_primary:
   | diagnostic_function_ref
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_primary () %p',[$$]),vDebug);
+{$ENDIF}
   }
   /* conflicts but tolerable? */
   | pLPAREN table_exp pRPAREN
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_primary ( (table_exp) ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   /* covered by above? */
   | pLPAREN generic_exp pRPAREN
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('generic_primary ( (generic_exp) ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3442,7 +4104,9 @@ aggregate_function_ref:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAggregate,ctUnknown,$1,$4);
   chainNext($$,$3);
   (* todo check if $1.ntype=ntSum or ntAvg then $4.dtype must be numeric *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('aggregate_function_ref %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCOUNT pLPAREN OPT_alldistinct scalar_exp pRPAREN
   {
@@ -3450,13 +4114,17 @@ aggregate_function_ref:
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAggregate,ctUnknown,$$,$4);
   chainNext($$,$3);
   (* only needed because above does not beat below *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('aggregate_function_ref (COUNT(scalar_exp)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCOUNT pLPAREN pASTERISK pRPAREN
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCount,ctNumeric,0,0);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntAggregate,ctNumeric,$$,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('aggregate_function_ref (COUNT(*)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3492,7 +4160,9 @@ todo scalar_exp cause conflict with scalar_exp_commalist
     kwOVERLAPS pLPAREN scalar_exp pCOMMA scalar_exp pRPAREN /*note: wrong! */
   {
   $$:=$6;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('overlaps_cond ( (scalar_exp,scalar_exp) OVERLAPS (scalar_exp,scalar_exp) ) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3509,7 +4179,9 @@ catalog:
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('catalog %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3517,7 +4189,9 @@ schema:
   tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema (identifier) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3527,18 +4201,24 @@ domain:
   node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,$1);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDomain,ctUnknown,node,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('domain (catalog.schema.domain) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT tIDENTIFIER
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDomain,ctUnknown,node,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('domain (schema.domain) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDomain,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('domain (domain) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3547,7 +4227,9 @@ column:
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3558,25 +4240,33 @@ column_ref:
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,$3);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,$5);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,node,$7);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_ref (catalog.schema.table.column) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT tIDENTIFIER pDOT tIDENTIFIER
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$1);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,node,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_ref (schema.table.column) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT tIDENTIFIER
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,nil,$1);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,node,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_ref (table.column) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntColumnRef,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('column_ref (column) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3584,7 +4274,9 @@ table:
   base_table_OR_view
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('table (base_table_OR_view) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3610,18 +4302,24 @@ base_table_OR_view:
   node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,$1);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_OR_view (catalog.schema.table) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT tIDENTIFIER
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$1);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,node,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_OR_view (schema.table) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTable,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('base_table_OR_view (table) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3631,18 +4329,24 @@ routine:
   node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,$1);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRoutine,ctUnknown,node,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine (catalog.schema.routine) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT tIDENTIFIER
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$1);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRoutine,ctUnknown,node,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine (schema.routine) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntRoutine,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine (routine) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3650,7 +4354,9 @@ routine_parameter:
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('routine_parameter %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3658,7 +4364,9 @@ compound_label:
   tLABEL
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('compound_label %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3666,7 +4374,9 @@ OPT_compound_label:
   compound_label
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('OPT_compound_label %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | /* nothing */
   {
@@ -3678,7 +4388,9 @@ compound_label_end:
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('compound_label_end %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3686,7 +4398,9 @@ OPT_compound_label_end:
   compound_label_end
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('OPT_compound_label_end %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | /* nothing */
   {
@@ -3700,18 +4414,24 @@ constraint:
   node:=mkNode(GlobalParseStmt.srootAlloc,ntCatalog,ctUnknown,nil,$1);
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,node,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraint,ctUnknown,node,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('constraint (catalog.schema.constraint) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER pDOT tIDENTIFIER
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$3);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraint,ctUnknown,node,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('constraint (schema.constraint) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntConstraint,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('constraint (constraint) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3771,19 +4491,25 @@ param_or_var:
   node.nullVal:=true;
   node.dwidth:=length(nullshow); (*note: only really for ISQL demo*)
   $$:=node;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('param_or_var (null) %p',[$$]),vDebug);
+{$ENDIF}
   }
   /* note: dynamic insert only */
   | kwDEFAULT
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntDefault,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('param_or_var (default) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | tPARAM
   {
   $$:=$1;
   globalParseStmt.addParam($$); (* todo check result *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('param_or_var (param) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3810,37 +4536,51 @@ authID_function_ref:
   kwUSER
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authID_function_ref (user) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCURRENT_USER
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authID_function_ref (current_user) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSESSION_USER
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntSessionUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authID_function_ref (session_user) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSYSTEM_USER
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntSystemUser,ctVarChar,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authID_function_ref (system_user) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCURRENT_AUTHID
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentAuthID,ctInteger,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authID_function_ref (current_authid) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCURRENT_CATALOG
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentCatalog,ctVarChar,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authID_function_ref (current_catalog) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCURRENT_SCHEMA
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentSchema,ctVarChar,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('authID_function_ref (current_schema) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3848,17 +4588,23 @@ datetime_function_ref:
   kwCURRENT_DATE
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntCurrentDate,ctDate,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datetime_function_ref (current date) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCURRENT_TIME OPT_integer
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCurrentTime,ctTime,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datetime_function_ref (current time) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwCURRENT_TIMESTAMP OPT_integer
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCurrentTimestamp,ctTimestamp,$2,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datetime_function_ref (current timestamp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3866,7 +4612,9 @@ diagnostic_function_ref:
   kwSQLSTATE
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntSQLState,ctVarChar,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('diagnostic_function_ref (sqlstate) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3879,7 +4627,9 @@ catalog:
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('catalog %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   };
 */
 
@@ -3900,7 +4650,9 @@ range_variable:       /* Note: the standard refers to this as a correlation name
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('range_variable %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3908,7 +4660,9 @@ cursor:
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cursor %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -3917,152 +4671,208 @@ datatype:
   ONE_character pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCharacter,ctChar,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (character(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_character
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
   node.numVal:=1;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCharacter,ctChar,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (character) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_character kwVARYING pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntVarChar,ctVarChar,$4,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (character varying(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwVARCHAR pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntVarChar,ctVarChar,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (varchar(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwBIT pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntBit,ctBit,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (bit(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwBIT kwVARYING pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntVarBit,ctVarBit,$4,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (bit varying(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwNUMERIC pLPAREN integer pCOMMA integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNumeric,ctNumeric,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (numeric(integer,integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwNUMERIC pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNumeric,ctNumeric,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (numeric(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwNUMERIC
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumeric,ctNumeric,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (numeric) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_decimal pLPAREN integer pCOMMA integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDecimal,ctDecimal,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (decimal(integer,integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_decimal pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntDecimal,ctDecimal,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (decimal(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_decimal
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntDecimal,ctDecimal,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (decimal) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_integer
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntInteger,ctInteger,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (integer) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwSMALLINT
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntSmallInt,ctSmallInt,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (smallint) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwBIGINT
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntBigInt,ctBigInt,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (bigint) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwFLOAT pLPAREN integer pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (float(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwFLOAT
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (float) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwREAL
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
   node.numVal:=DefaultRealSize;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (real) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDOUBLE kwPRECISION 
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
   node.numVal:=DefaultDoubleSize;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntFloat,ctFloat,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (double precision) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwDATE
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntDate,ctDate,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (date) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwTIME pLPAREN integer pRPAREN OPT_withtimezone
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTime,ctTime,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (time(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwTIME OPT_withtimezone
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTime,ctTime,nil,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (time) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwTIMESTAMP pLPAREN integer pRPAREN OPT_withtimezone
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTimestamp,ctTimestamp,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (timestamp(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | kwTIMESTAMP OPT_withtimezone
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTimestamp,ctTimestamp,nil,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (timestamp) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_blob
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
   node.numVal:=1024;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntBlob,ctBlob,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (blob) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_blob pLPAREN blob_length pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntBlob,ctBlob,$4,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (blob(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_clob
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntNumber,ctNumeric,0,0);
   node.numVal:=1024;
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntClob,ctClob,node,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (clob) %p',[$$]),vDebug);
+{$ENDIF}
   }
   | ONE_clob pLPAREN blob_length pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntClob,ctClob,$4,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('datatype (clob(integer)) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4070,7 +4880,9 @@ blob_length:
   integer
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('blob_length (integer) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   };
 
 
@@ -4086,7 +4898,9 @@ integer:
   tINTEGER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('integer %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4094,7 +4908,9 @@ real:
   tREAL
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('real %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4102,7 +4918,9 @@ string:
   tSTRING
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('string %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4110,7 +4928,9 @@ blob:
   tBLOB
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('blob %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4121,13 +4941,19 @@ literal_DATE:
   $$:=$2;
   $$.ntype:=ntDate;
   $$.dtype:=ctDate;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_DATE %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   try
     strToSqlDate(yylval.strVal);
   except
     (*todo raise better*)
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,$$]),vError);
+{$ENDIF}
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+{$ENDIF}
     GlobalSyntaxErrLine:=yylineno;
     GlobalSyntaxErrCol:=yycolno;
     GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -4142,13 +4968,19 @@ literal_TIME:
   $$:=$2; (*todo plus timezone*)
   $$.ntype:=ntTime;
   $$.dtype:=ctTime;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_TIME %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   try
     strToSqlTime(TIMEZONE_ZERO,yylval.strVal,dayCarry);
   except
     (*todo raise better*)
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,$$]),vError);
+{$ENDIF}
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+{$ENDIF}
     GlobalSyntaxErrLine:=yylineno;
     GlobalSyntaxErrCol:=yycolno;
     GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -4163,13 +4995,19 @@ literal_TIMESTAMP:
   $$:=$2; (*todo plus timezone*)
   $$.ntype:=ntTimestamp;
   $$.dtype:=ctTimestamp;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_TIMESTAMP %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   try
     strToSqlTimestamp(TIMEZONE_ZERO,yylval.strVal);
   except
     (*todo raise better*)
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('error in line %d, column %d at token %s ($$=%p)',[yylineno,yycolno,yytext,$$]),vError);
+{$ENDIF}
+{$IFDEF Debug_Log}
     log.add(yywho,yywhere,format('...%s%s',[yytext,GlobalParseStmt.InputText]),vError);
+{$ENDIF}
     GlobalSyntaxErrLine:=yylineno;
     GlobalSyntaxErrCol:=yycolno;
     GlobalSyntaxErrMessage:=format('...%s%s...',[yytext,copy(GlobalParseStmt.InputText,1,30)]);
@@ -4182,7 +5020,9 @@ literal_INTERVAL:
   /* todo check format and give syntax error now? */
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_INTERVAL %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 literal_BITSTRING:
@@ -4190,33 +5030,43 @@ literal_BITSTRING:
   /* todo check format and give syntax error now */
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_BITSTRING %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 literal_STRING:
   string
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_STRING %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 literal_NUM:
   integer
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_NUM (integer) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | real
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_NUM (real) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ; /* todo & rest */
 literal_BLOB:
   blob
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('literal_BLOB %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4225,57 +5075,79 @@ scalar_function_ref:
   cast_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (cast_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | case_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (case_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | case_shorthand_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (case_shorthand_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | char_length_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (char_length_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | octet_length_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (octet_length_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | trim_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (trim_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | fold_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (fold_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | position_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (position_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | substring_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (substring_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | sequence_expression  /* non-standard */
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (sequence_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | user_function_expression
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('scalar_function_ref (user_function_expression) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4283,7 +5155,9 @@ user_function_expression:
   routine pLPAREN OPT_scalar_exp_commalist pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntUserFunction,ctUnknown,$1,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('user_function_expression %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4291,7 +5165,9 @@ cast_expression:
   kwCAST pLPAREN scalar_exp kwAS datatype pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCast,$5.dtype(*ctUnknown*),$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('cast_expression %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4302,7 +5178,9 @@ case_expression:
   kwEND
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCase,ctUnknown,$2,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('case_expression (condition list) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   |
   kwCASE scalar_exp
@@ -4313,14 +5191,18 @@ case_expression:
   node:=mkNode(GlobalParseStmt.srootAlloc,ntCaseOf,ctUnknown,nil,$3);
   linkLeftChild(node,$2); (* link after, so we use type of when_clause *)
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCase,ctUnknown,node,$4);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('case_expression (of + expression list) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 case_OPT_else:
   kwELSE scalar_exp
   {
   $$:=$2;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('case_OPT_else %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
@@ -4330,7 +5212,9 @@ when_clause:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntWhen,ctUnknown,nil,$4); (* note: mkNode to allow mixed children types here *)
   linkLeftChild($$,$2); (* link after, so we use type of THEN *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_clause %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 when_clause_list:
@@ -4338,13 +5222,17 @@ when_clause_list:
   {
   chainNext($1,$2);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_clause_list (list,e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   |
   when_clause
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_clause_list (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4353,7 +5241,9 @@ when_clause_type2:
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntWhenType2,ctUnknown,nil,$4);    (* note: mkNode to allow mixed children types here *)
   linkLeftChild($$,$2); (* link after, so we use type of THEN *)
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_clause_type2 %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 when_clause_type2_list:
@@ -4361,13 +5251,17 @@ when_clause_type2_list:
   {
   chainNext($1,$2);
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_clause_type2_list (list,e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   |
   when_clause_type2
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('when_clause_type2_list (e) %p',[$$]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4375,12 +5269,16 @@ case_shorthand_expression:
   kwNULLIF pLPAREN scalar_exp pCOMMA scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNullIf,ctUnknown,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('case_shorthand_expression (nullif) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwCOALESCE pLPAREN scalar_exp_commalist_literal_order pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCoalesce,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('case_shorthand_expression (coalesce) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4388,12 +5286,16 @@ trim_expression:
   kwTRIM pLPAREN trim_what kwFROM scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTrim,ctUnknown,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('trim_expression (what char) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwTRIM pLPAREN scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTrim,ctUnknown,nil,$3);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('trim_expression (char) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4402,17 +5304,23 @@ trim_what:
   {
   node:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimBoth,ctUnknown,0,0);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTrimWhat,ctUnknown,node,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('OPT_trim_what (char) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | trim_where
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTrimWhat,ctUnknown,$1,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('OPT_trim_what (trim_where) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | trim_where scalar_exp
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntTrimWhat,ctUnknown,$1,$2);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('OPT_trim_what (trim_where char) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4420,17 +5328,23 @@ trim_where:
   kwLEADING
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimLeading,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('trim_where (LEADING) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwTRAILING
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimTrailing,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('trim_where (TRAILING) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwBOTH
   {
   $$:=mkLeaf(GlobalParseStmt.srootAlloc,ntTrimBoth,ctUnknown,0,0);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('trim_where (BOTH) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4438,12 +5352,16 @@ char_length_expression:
   kwCHARACTER_LENGTH pLPAREN scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCharLength,ctNumeric,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('character_length_expression %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwCHAR_LENGTH pLPAREN scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntCharLength,ctNumeric,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('char_length_expression %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4451,7 +5369,9 @@ octet_length_expression:
   kwOCTET_LENGTH pLPAREN scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntOctetLength,ctNumeric,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('octet_length_expression %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4459,12 +5379,16 @@ fold_expression:
   kwLOWER pLPAREN scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntLower,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('fold_expression (LOWER) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwUPPER pLPAREN scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntUpper,ctUnknown,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('fold_expression (UPPER) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4472,7 +5396,9 @@ position_expression:
   kwPOSITION pLPAREN scalar_exp kwIN scalar_exp pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntPosition,ctNumeric,$3,$5);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('position_expression %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4481,13 +5407,17 @@ substring_expression:
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSubstringFrom,ctUnknown,$5,$7);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSubstring,ctUnknown,$3,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('substring_expression (FOR) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwSUBSTRING pLPAREN scalar_exp kwFROM generic_exp pRPAREN
   {
   node:=mkNode(GlobalParseStmt.srootAlloc,ntSubstringFrom,ctUnknown,$5,nil);
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSubstring,ctUnknown,$3,node);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('substring_expression %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4495,12 +5425,16 @@ sequence_expression:
   kwNEXT_SEQUENCE pLPAREN sequence pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntNextSequence,ctNumeric,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sequence_expression (next) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | kwLATEST_SEQUENCE pLPAREN sequence pRPAREN
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntLatestSequence,ctNumeric,$3,nil);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('sequence_expression (latest) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4515,7 +5449,9 @@ user:
   tIDENTIFIER
   {
   $$:=$1;
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('user %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   ;
 
@@ -4704,7 +5640,9 @@ OPT_schema:
   tIDENTIFIER
   {
   $$:=mkNode(GlobalParseStmt.srootAlloc,ntSchema,ctUnknown,nil,$1);
+{$IFDEF Debug_Log}
   log.add(yywho,yywhere,format('schema (identifier) %p, yylval=%p',[$$,yylval]),vDebug);
+{$ENDIF}
   }
   | /* nothing */ {$$:=nil;}
   ;
