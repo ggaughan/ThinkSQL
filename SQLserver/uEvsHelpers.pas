@@ -30,10 +30,10 @@ type
     constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil); override;
     destructor Destroy; override;
     procedure Terminate;
-    property Terminated :Boolean read FTerminated;// write FTerminated;
-    property Suspended  :Boolean read GetSuspended;
-    Property Handle : THandle read GetHandle;
-    property ThreadID:LongWord read GetThreadID;
+    property Terminated :Boolean  read FTerminated;// write FTerminated;
+    property Suspended  :Boolean  read GetSuspended;
+    Property Handle     :THandle  read GetHandle;
+    property ThreadID   :LongWord read GetThreadID;
   end;
 
   TTcpConnectionHelper = class Helper for TIDTcpConnection
