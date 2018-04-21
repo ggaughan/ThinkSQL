@@ -1,0 +1,11 @@
+P1    London         
+P1    Paris          
+P2    London         
+P2    Paris          
+P3    London         
+P3    Rome           
+P4    London         
+P5    London         
+P5    Paris          
+P6    London         
+

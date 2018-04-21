@@ -1,0 +1,1 @@
+TABLE table_1 UNION TABLE table_2

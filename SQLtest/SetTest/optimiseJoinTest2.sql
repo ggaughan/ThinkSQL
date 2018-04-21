@@ -1,0 +1,1 @@
+select * from (select * from table_1) as X natural join (select * from table_2) as Y

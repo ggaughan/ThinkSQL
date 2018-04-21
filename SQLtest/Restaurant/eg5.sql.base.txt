@@ -1,0 +1,8 @@
+          1Soup of the Day                                   1                2.45
+        101Spaghetti Bolognese                               2                1.95
+        102Paella                                            2                6.95
+        103Borsch                                            2                4.95
+        105Kedgeree                                          2                4.99
+        109Chicken Tikka Masala                              2                5.95
+        305Cola                                              5                1.20
+

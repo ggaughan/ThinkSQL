@@ -1,0 +1,1 @@
+select b as common, "first".one, second.two, * from "first" left join second using (b)

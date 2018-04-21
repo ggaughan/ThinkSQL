@@ -1,0 +1,1 @@
+select * from "first" full outer join second using (b);

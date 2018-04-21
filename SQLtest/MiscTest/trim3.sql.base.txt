@@ -1,0 +1,7 @@
+NOSPACES.                      
+   LEADING SPACES.             
+TRAILING SPACES.               
+   BOTH SPACES.                
+lower case.                    
+UPPER CASE.                    
+

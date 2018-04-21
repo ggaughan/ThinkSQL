@@ -1,0 +1,1 @@
+select * from table_1 natural join (select * from table_1 union (select * from table_1 natural join table_2)) as X
