@@ -1,0 +1,8 @@
+--Error
+SELECT
+a.menu_item_no , b.menu_item_no 
+FROM
+menu_item a , menu_item b 
+WHERE a.menu_item_no = b.menu_item_no
+AND a.menu_item_no = 1
+GROUP BY menu_item_no   --needs a prefix!

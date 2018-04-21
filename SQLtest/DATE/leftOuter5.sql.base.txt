@@ -1,0 +1,14 @@
+S1   Smith                              20.00London         S1   P1                  300.00
+S1   Smith                              20.00London         S1   P2                  200.00
+S1   Smith                              20.00London         S1   P3                  400.00
+S1   Smith                              20.00London         S1   P4                  200.00
+S1   Smith                              20.00London         S1   P5                  100.00
+S1   Smith                              20.00London         S1   P6                  100.00
+S2   Jones                              10.00Paris          S2   P1                  300.00
+S2   Jones                              10.00Paris          S2   P2                  400.00
+S3   Blake                              30.00Paris          S3   P2                  200.00
+S4   Clark                              20.00London         S4   P2                  200.00
+S4   Clark                              20.00London         S4   P4                  300.00
+S4   Clark                              20.00London         S4   P5                  400.00
+S5   Adams                              30.00Athens                                        
+

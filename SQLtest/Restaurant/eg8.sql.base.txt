@@ -1,0 +1,23 @@
+          1          1Prawn Cocktail                                          1.00                2.95                2.95
+          1          2Irish stew                                              1.00                3.95                3.95
+          1          3Red Wine                                                1.00                2.10                2.10
+          2          1Samosas                                                 1.00                1.95                1.95
+          2          2Chicken Madras                                          2.00                5.45               10.90
+          2          3Boiled Rice                                             2.00                1.95                3.90
+          2          4Lager                                                   1.00                1.85                1.85
+          2          5Lemonade                                                1.00                1.20                1.20
+          3          1Lasagne                                                 1.00                4.95                4.95
+          3          2Boeuf Bourgignone                                       1.00                7.95                7.95
+          3          3Mashed Potato                                           1.00                1.45                1.45
+          3          4White Wine                                              2.00                2.10                4.20
+          4          1Roast Beef and Yorkshire Pudding                        2.00                6.45               12.90
+          4          2Guinness                                                1.00                2.99                2.99
+          4          3Ice Cream                                               1.00                2.99                2.99
+          5          1Boeuf Bourgignone                                       1.00                7.95                7.95
+          5          2Roast Beef and Yorkshire Pudding                        1.00                6.45                6.45
+          5          3Mashed Potato                                           1.00                1.45                1.45
+          5          4Boiled Rice                                             1.00                1.95                1.95
+          5          5Red Wine                                                2.00                2.10                4.20
+          5          6Lemonade                                                2.00                1.20                2.40
+          5          7Ice Cream                                               2.00                2.99                5.98
+

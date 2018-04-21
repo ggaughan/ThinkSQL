@@ -1,0 +1,23 @@
+          1Soup of the Day                                   1                2.45
+          2Samosas                                           1                1.95
+          3Prawn Cocktail                                    1                2.95
+        100Lasagne                                           2                4.95
+        101Spaghetti Bolognese                               2                1.95
+        102Paella                                            2                6.95
+        103Borsch                                            2                4.95
+        104Irish stew                                        2                3.95
+        105Kedgeree                                          2                4.99
+        106Boeuf Bourgignone                                 2                7.95
+        107Roast Beef and Yorkshire Pudding                  2                6.45
+        108Chicken Madras                                    2                5.45
+        109Chicken Tikka Masala                              2                5.95
+        200Boiled Rice                                       3                1.95
+        201Mashed Potato                                     3                1.45
+        300Red Wine                                          7                2.10
+        301White Wine                                        7                2.10
+        302Guinness                                          6                2.99
+        303Lager                                             6                1.85
+        304Lemonade                                          5                1.20
+        305Cola                                              5                1.20
+        400Ice Cream                                         4                2.99
+

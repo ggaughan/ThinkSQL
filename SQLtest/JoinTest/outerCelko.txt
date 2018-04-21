@@ -1,0 +1,194 @@
+Top of Form 1
+>> I am confused with the syntax on outer join.  In Informix and Oracle
+I can use statement as shown in option 2 whereas MS SQL uses option 1.
+Which of the two is ANSI compliant?.  <<
+
+The infixed operators are Standard.  Here is how OUTER JOINs work in
+SQL-92.  Assume you are given:
+
+Table1       Table2
+ a   b        a   c
+ ======       ======
+ 1   w        1   r
+ 2   x        2   s
+ 3   y        3   t
+ 4   z
+
+and the outer join expression:
+
+ Table1
+ LEFT OUTER JOIN
+ Table2
+ ON Table1.a = Table2.a      <== join condition
+    AND Table2.c = 't';      <== single table condition
+
+We call Table1 the "preserved table" and Table2 the "unpreserved table"
+in the query.  What I am going to give you is a little different, but
+equivalent to the ANSI/ISO standards.
+
+1)  We build the CROSS JOIN of the two tables.  Scan each row in the
+result set.
+
+2) If the predicate tests TRUE for that row, then you keep it. You also
+remove all rows derived from it from the CROSS JOIN
+
+3) If the predicate tests FALSE or UNKNOWN for that row, then keep the
+columns from the preserved table, convert all the columns from the
+unpreserved table to NULLs and remove the duplicates.
+
+So let us execute this by hand:
+
+ Let @ = passed the first predicate
+ Let * = passed the second predicate
+
+ Table1 CROSS JOIN Table2
+ a   b        a   c
+ =========================
+ 1   w       1   r @
+ 1   w       2   s
+ 1   w       3   t *
+ 2   x       1   r
+ 2   x       2   s @
+ 2   x       3   t *
+ 3   y       1   r
+ 3   y       2   s
+ 3   y       3   t @* <== the TRUE set
+ 4   z       1   r
+ 4   z       2   s
+ 4   z       3   t *
+
+ Table1 LEFT OUTER JOIN Table2
+ a   b        a   c
+ =========================
+ 3   y     3      t      <= only TRUE row
+ -----------------------
+ 1   w     NULL   NULL   Sets of duplicates
+ 1   w     NULL   NULL
+ 1   w     NULL   NULL
+ -----------------------
+ 2   x     NULL   NULL
+ 2   x     NULL   NULL
+ 2   x     NULL   NULL
+ 3   y     NULL   NULL  <== derived from the TRUE set - Remove
+ 3   y     NULL   NULL
+ -----------------------
+ 4   z     NULL   NULL
+ 4   z     NULL   NULL
+ 4   z     NULL   NULL
+
+the final results:
+
+ Table1 LEFT OUTER JOIN Table2
+ a   b        a   c
+ =========================
+ 1   w     NULL   NULL
+ 2   x     NULL   NULL
+ 3   y     3      t
+ 4   z     NULL   NULL
+
+The basic rule is that every row in the preserved table is represented
+in the results in at least one result row.
+
+There are limitations and very serious problems with the extended
+equality version of an outer join used in some diseased mutant
+products.  Consider the two Chris Date tables
+
+ Suppliers        SupParts
+ supno             supno partno qty
+ =========        ==============
+ S1               S1   P1    100
+ S2               S1   P2    250
+ S3               S2   P1    100
+                  S2   P2    250
+
+and let's do an extended equality outer join like this:
+
+ SELECT *
+  FROM Supplier, SupParts
+ WHERE Supplier.supno *= SupParts.supno
+   AND qty < 200;
+
+If I do the outer first, I get:
+
+ Suppliers LOJ SupParts
+ supno supno partno qty
+ =======================
+ S1     S1   P1    100
+ S1     S1   P2    250
+ S2     S2   P1    100
+ S2     S2   P2    250
+ S3   NULL  NULL   NULL
+
+Then I apply the (qty < 200) predicate and get
+
+ Suppliers LOJ SupParts
+ supno supno partno qty
+ ===================
+ S1   S1   P1    100
+ S2   S2   P1    100
+
+Doing it in the opposite order
+
+ Suppliers LOJ SupParts
+ supno supno partno qty
+ ===================
+ S1   S1   P1    100
+ S2   S2   P1    100
+ S3   NULL NULL  NULL
+
+Sybase does it one way, Oracle does it the other and Centura (nee
+Gupta) lets you pick which one -- the worst of both non-standard
+worlds!  In SQL-92, you have a choice and can force the order of
+execution. Either do the predicates after the join ...
+
+ SELECT *
+   FROM Supplier
+        LEFT OUTER JOIN
+        SupParts
+        ON Supplier.supno = SupParts.supno
+ WHERE qty < 200;
+
+ ... or do it in the joining:
+
+ SELECT *
+  FROM Supplier
+       LEFT OUTER JOIN
+       SupParts
+       ON Supplier.supno = SupParts.supno
+          AND qty < 200;
+
+Another problem is that you cannot show the same table as preserved and
+unpreserved in the extended equality version, but it is easy in SQL-
+92.  For example to find the students who have taken Math 101 and might
+have taken Math 102:
+
+ SELECT C1.student, C1.math, C2.math
+  FROM (SELECT * FROM Courses WHERE math = 101) AS C1
+       LEFT OUTER JOIN
+       (SELECT * FROM Courses WHERE math = 102) AS C2
+       ON C1.student = C2.student;
+
+--CELKO--
+Joe Celko, SQL and Database Consultant
+When posting, inclusion of SQL (CREATE TABLE ..., INSERT ..., etc)
+which can be cut and pasted into Query Analyzer is appreciated.
+
+
+Sent via Deja.com <http://www.deja.com/>
+Before you buy.
+
+Google Web Directory <http://directory.google.com> - Cool Jobs </jobs/> -
+Advertise with Us </ads/> - Add Google to Your Site </services/> - Google in
+your Language </language.html> - All About Google </about.html> 
+
+©2001 Google
+
+
+
+Any views or opinions are solely those of the author and do not necessarily
+represent those of Channel Four Television Corporation unless specifically
+stated.  This email and any files transmitted are confidential and intended
+solely for the use of the individual or entity to which they are addressed.
+If you have received this email in error, please notify
+postmaster@channel4.co.uk
+

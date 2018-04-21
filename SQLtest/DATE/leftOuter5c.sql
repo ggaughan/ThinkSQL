@@ -1,0 +1,1 @@
+select * from s natural left join sp 

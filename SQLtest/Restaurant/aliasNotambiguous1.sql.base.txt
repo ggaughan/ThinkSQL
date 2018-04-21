@@ -1,0 +1,23 @@
+Boeuf Bourgignone                       Boeuf Bourgignone                       
+Boiled Rice                             Boiled Rice                             
+Borsch                                  Borsch                                  
+Chicken Madras                          Chicken Madras                          
+Chicken Tikka Masala                    Chicken Tikka Masala                    
+Cola                                    Cola                                    
+Guinness                                Guinness                                
+Ice Cream                               Ice Cream                               
+Irish stew                              Irish stew                              
+Kedgeree                                Kedgeree                                
+Lager                                   Lager                                   
+Lasagne                                 Lasagne                                 
+Lemonade                                Lemonade                                
+Mashed Potato                           Mashed Potato                           
+Paella                                  Paella                                  
+Prawn Cocktail                          Prawn Cocktail                          
+Red Wine                                Red Wine                                
+Roast Beef and Yorkshire Pudding        Roast Beef and Yorkshire Pudding        
+Samosas                                 Samosas                                 
+Soup of the Day                         Soup of the Day                         
+Spaghetti Bolognese                     Spaghetti Bolognese                     
+White Wine                              White Wine                              
+

@@ -1,0 +1,4 @@
+S2   Jones                              10.00Paris          
+S3   Blake                              30.00Paris          
+S5   Adams                              30.00Athens         
+

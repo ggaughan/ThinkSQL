@@ -1,0 +1,1 @@
+(SELECT * FROM table_1) EXCEPT ALL (SELECT * FROM table_2)
