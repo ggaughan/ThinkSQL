@@ -1,7 +1,7 @@
 ThinkSQL Relational Database Management System - Source Code
 ============================================================
 
-            Copyright © 2000-2012  Greg Gaughan
+            Copyright © 2000-2018  Greg Gaughan
 
 This is the source code for the ThinkSQL database system.
 
