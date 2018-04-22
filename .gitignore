@@ -4,3 +4,4 @@ __history
 /DebuglogReplace/*.exe
 *.identcache
 *.res
+/dcpcrypt2

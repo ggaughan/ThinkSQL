@@ -5,10 +5,12 @@
                   See LICENCE.txt for details
 }
 {$I Defs.inc}
-{$IFDEF Debug_Log} {$Undef Debug_Log} {$ENDIF}
-{.$DEFINE DEBUG_LOG}
+
+{.$DEFINE DEBUG_LOG} //jkoz only for local debug.
+{$IFDEF Debug_Log}
 {$DEFINE DEBUGDETAIL}
 {$DEFINE DEBUGDETAIL2}  //show client SQL
+{$ENDIF}
 
 {CLI (=ODBC) server-side routines
 
@@ -55,11 +57,11 @@
    server columns start at 0, clients at 1: so server always returns column-ref+1.
 
  todo
-   return varying fail codes so we can tell exactly where the function failed 
+   return varying fail codes so we can tell exactly where the function failed
 
 }
 
-interface
+interface  //JKOZ: indy Clean up?.
 
 uses uConnectionMgr {for passing thread};
 

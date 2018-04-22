@@ -29,7 +29,7 @@ unit uGlobal;
        usually alongside a comment about how to improve the speed of a routine
        (often initial code is simple but slow so major increases are possible)
 }
-
+{$I Defs.inc}
 interface
 
 uses
@@ -360,7 +360,7 @@ type
 
   {Column definitions needed to sys search sysIndex}
   //todo keep in sync. with creation
-  sysIndex_columns=(si_index_id,
+  SysIndex_columns=(si_index_id,
                     si_index_name,
                     si_table_id,
                     si_index_type,
@@ -373,14 +373,14 @@ type
 
   {Column definitions needed to sys search sysIndexColumn}
   //todo keep in sync. with creation
-  sysIndexColumn_columns=(sic_index_id,
+  SysIndexColumn_columns=(sic_index_id,
                           sic_column_id,
                           sic_column_sequence
                          );
 
   {Column definitions needed for sysRoutine}
   //todo keep in sync. with creation
-  sysRoutine_columns=(sr_Routine_Id,
+  SysRoutine_columns=(sr_Routine_Id,
                       sr_Routine_Name,
                       sr_Schema_id,
                       sr_Module_id,
@@ -391,9 +391,9 @@ type
                       //todo remarks
                       );
 
-  {Column definitions needed for sysParameter}
+  {Column definitions needed for SysParameter}
   //todo keep in sync. with creation
-  sysParameter_columns=(sp_Routine_Id,
+  SysParameter_Columns=(sp_Routine_Id,
                         sp_Parameter_id,
                         sp_Parameter_name,
                         //todo remove sc_domain_id,     //populated when created, but not linked - use sc_datatype
@@ -408,14 +408,14 @@ type
 
   {from uIterSort/uIterGroup}
   {Column sort direction}
-  TsortDirection=(sdASC,sdDESC);
+  TSortDirection=(sdASC,sdDESC);
 
   EConnectionException=class(Exception);
 
-  TindexState=(isOk,isBeingBuilt); //todo future ones may be isBeingRemoved, isCorrupt
+  TIndexState=(isOk,isBeingBuilt); //todo future ones may be isBeingRemoved, isCorrupt
 
   {Variable/parameter types} //Note: ord() stored externally, so only grow at ends
-  TvariableType=(vtIn,vtOut,vtInOut,vtResult,vtDeclared);
+  TVariableType=(vtIn,vtOut,vtInOut,vtResult,vtDeclared);
   VarRef=word;                       //variable/parameter subscript (depends on MaxVar) (limits # vars per block=65535)
 
 const
@@ -695,10 +695,10 @@ var
   MaxFrames:integer=DefaultMaxFrames; //todo use, but need to make Fframe dynamic array: todo check performance!
 
 // Bit manipulating
-function bitSet(const Value: cardinal; const TheBit: TBit): Boolean;
-function bitOn(const Value: cardinal; const TheBit: TBit): cardinal;
-function bitOff(const Value: cardinal; const TheBit: TBit): cardinal;
-function bitToggle(const Value: cardinal; const TheBit: TBit): cardinal;
+function BitSet   (const Value: Cardinal; const TheBit: TBit): Boolean;
+function BitOn    (const Value: Cardinal; const TheBit: TBit): cardinal;
+function BitOff   (const Value: Cardinal; const TheBit: TBit): cardinal;
+function BitToggle(const Value: Cardinal; const TheBit: TBit): cardinal;
 
 //Three valued logic operations
 //todo speed them up - macros?
@@ -722,7 +722,7 @@ function CompareDate(dtl,dtr:TsqlDate;var res:shortint):integer;
 function CompareTime(tml,tmr:TsqlTime;var res:shortint):integer;
 function CompareTimestamp(tsl,tsr:TsqlTimestamp;var res:shortint):integer;
 
-function trimleftWS(s:string):string;
+function TrimLeftWS(s:string):string;{$IFDEF D2007up}inline;{$ENDIF}
 
 
 implementation
@@ -731,10 +731,10 @@ const
   where='uGlobal';
 
 {Note: in these bit routines, 0 is the first bit}
-function bitSet(const Value: cardinal; const TheBit: TBit): Boolean;
+function BitSet(const Value: cardinal; const TheBit: TBit): Boolean;
 {Checks if a bit is set}
 begin
-  Result:= (Value and (1 shl TheBit)) <> 0;
+  Result := (Value and (1 shl TheBit)) <> 0;
 end;
 (* todo: is this faster & Kylix compatible? -speed: timings show no difference (10 million calls, D5)
 function IsBit(Value, Pos: Integer): Boolean;
@@ -746,17 +746,17 @@ asm
  adc eax,0
 end;*)
 
-function bitOn(const Value: cardinal; const TheBit: TBit): cardinal;
+function BitOn(const Value: cardinal; const TheBit: TBit): cardinal;
 begin
   Result := Value or (1 shl TheBit);
 end;
 
-function bitOff(const Value: cardinal; const TheBit: TBit): cardinal;
+function BitOff(const Value: Cardinal; const TheBit: TBit): cardinal;
 begin
   Result := Value and ((1 shl TheBit) xor $FFFFFFFF); //todo replace with constant
 end;
 
-function bitToggle(const Value: cardinal; const TheBit: TBit): cardinal;
+function BitToggle(const Value: cardinal; const TheBit: TBit): cardinal;
 begin
   result := Value xor (1 shl TheBit);
 end;
@@ -969,12 +969,15 @@ begin
     CompareTime(tsl.time,tsr.time,res);
 end; {CompareTimestamp}
 
-function trimleftWS(s:string):string;
+function TrimLeftWS(s:string):string;{$IFDEF D2007up}inline;{$ENDIF}
 {Remove whitespace from the left of the string}
 begin
-  result:=trimLeft(s);
-  while (length(result)>0) and ((result[1]=TAB) or (result[1]=CR) or (result[1]=LF)) do
+  Result := TrimLeft(s); //trim left removes all characters less than space that includes tab, cr, lf etc for delphi 2007
+                         //I do not remember for earlier versions so the rest of the code will execute only for versions smaller than d2007
+  {$IFDEF D2007Up} { Delphi 2007- }
+  while (Length(Result)>0) and ((Result[1]=TAB) or (Result[1]=CR) or (Result[1]=LF)) do
     delete(result,1,1);
+  {$ENDIF}
 end; {trimleftWS}
 
 

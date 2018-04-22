@@ -203,9 +203,9 @@ begin
           {$IFDEF DEBUG_LOG}
           log.add(who,where,'Opened database',vDebug);
           log.add(who,where,'',vDebug);
-          {$ENDIF DEBUG_LOG}
           startDB.status; //debug report
           dbs.buffer.status;
+          {$ENDIF DEBUG_LOG}
 //          dbs.db.dirStatus(tr);
         end else begin
           {$IFDEF DEBUG_LOG}

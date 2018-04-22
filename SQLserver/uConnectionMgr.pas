@@ -19,14 +19,14 @@
 //  {$DEFINE INDY8}       //use old Indy: problem with shutdown - extra thread restarts/stop forever!
 //{$ENDIF}
 
-interface
+interface   //JKOZ: Indy clean;
 
 uses uGlobal, uServer, uTransaction, uMarshal, uStmt, SyncObjs{for TEvent},
      IdBaseComponent, IdComponent, IdTCPServer, IdThread, IdObjs, IdTCPConnection, IdYarn,
      uGlobalDef{for Tblob}
    {$IFDEF INDY10}
      ,IdContext
-   {$ENDIF}     
+   {$ENDIF}
      ,uEvsHelpers;
 
 type
@@ -62,9 +62,9 @@ type
 
     function getIP:string;
   protected
-    {$IFDEF INDY10}
-    function Run:Boolean; override;
-    {$ENDIF}
+
+    function Run{$IFDEF INDY10}:Boolean;{$ENDIF} override;
+
   public
     dbserver:TDBserver;    //- in future could have multiple servers per process?
 
@@ -384,12 +384,7 @@ begin
     result:='';
 end; {getIP}
 
-{$IFDEF INDY9}
-procedure TCMthread.Run;
-{$ENDIF}
-{$IFDEF INDY10}
-function TCMthread.Run:Boolean;
-{$ENDIF}
+function TCMthread.Run{$IFDEF INDY10}:Boolean{$ENDIF};
 const routine=':Run';
 type
   dumbMode=(dmNormal,dmCreate,dmBlock);
@@ -449,7 +444,7 @@ begin
   except
     {$IFDEF INDY9}
     Connection.DisconnectSocket;
-    Terminate; // a bit redundant? exit will take care of the the termination
+//    Terminate; // a bit redundant? exit will take care of the the termination
     {$ENDIF}
     {$IFDEF INDY10}
     Connection.Disconnect;

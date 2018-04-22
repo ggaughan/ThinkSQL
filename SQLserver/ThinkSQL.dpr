@@ -7,7 +7,6 @@ program ThinkSQL;
 {$I Defs.inc}
 {.$I Optional.use} // this include must be in the uses clause bellow. Adding and removing files from the project deletes it.
 uses
-  {$I Optional.use}
   uPage in 'uPage.pas',
   uGlobal in 'uGlobal.pas',
   uDatabase in 'uDatabase.pas',
@@ -59,7 +58,8 @@ uses
   uDatabaseMaint in 'uDatabaseMaint.pas',
   uMarshalGlobal in '..\Odbc\uMarshalGlobal.pas',
   uMarshal in '..\Odbc\uMarshal.pas',
-  uEvsHelpers in 'uEvsHelpers.pas';
+  uEvsHelpers in 'uEvsHelpers.pas',
+  uThinkSQLAPI in '..\Evosi\uThinkSQLAPI.pas';
 
 {$IFDEF WIN32}
 {$R *.RES}

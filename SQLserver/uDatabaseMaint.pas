@@ -1016,7 +1016,9 @@ begin
             log.add(targetTran.sysStmt.who,where+routine,'Opened new target database',vDebug);
             {$ENDIF}
             targetDB.status; //debug report
+          {$IFDEF Debug_Log}
             (targetDB.owner as TDBserver).buffer.status;
+          {$ENDIF}            
 
             result:=copySystemTables(st,connection,targetTran,targetDB);
             if result<>ok then
@@ -1105,7 +1107,9 @@ begin
             log.add(targetTran.sysStmt.who,where+routine,'Re-opened new target database',vDebug);
             {$ENDIF}
             targetDB.status; //debug report
+          {$IFDEF Debug_Log}
             (targetDB.owner as TDBserver).buffer.status;
+          {$ENDIF}            
 
             result:=copyTables(st,connection,targetTran,targetDB);
             if result<>ok then

@@ -9,9 +9,9 @@
 
 //{$DEFINE DEBUGDETAIL}
 //{$DEFINE DEBUGDETAIL2}
-
+{$I Defs.inc}
 interface
-
+//JKOZ: no indy
 uses uSyntax, uRelation, uTuple {for canSeeCol result},uGlobal;
 
 const

@@ -8995,7 +8995,9 @@ begin
         log.add(st.who,where,'',vDebug);
         {$ENDIF}
         Ttransaction(st.owner).db.status; //debug report
+      {$IFDEF Debug_Log}
         (Ttransaction(st.owner).db.owner as TDBserver).buffer.status;
+      {$ENDIF}        
         {Now add the information_schema}
         if Ttransaction(st.owner).db.createInformationSchema<>ok then
         begin

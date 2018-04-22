@@ -341,7 +341,9 @@ begin
 
     with (owner as TDBserver) do
     begin
+    {$IFDEF Debug_Log}
       buffer.status; //show the status now that the GC has definitely finished
+    {$ENDIF}      
 
       buffer.flushAllPages(tr.sysStmt);
     //todo check result of flushAll- if fail, force all to be flushed, even if pinned (better than bug->corruption?)
@@ -1411,10 +1413,12 @@ begin
 
 
           {Insert rows into sysTran}
+        {$IFDEF Debug_Log}
           with (owner as TDBserver) do
           begin
             buffer.status;
           end;
+        {$ENDIF}          
           result:=PrepareSQL(tr.sysStmt,nil,
             'INSERT INTO sysTran VALUES (1,''N''); ' );
           if result=ok then result:=ExecutePlan(tr.sysStmt,rc );
@@ -1434,10 +1438,12 @@ begin
             {$ELSE}
             ;
             {$ENDIF}
+        {$IFDEF Debug_Log}
           with (owner as TDBserver) do
           begin
             buffer.status;
           end;
+        {$ENDIF}          
   //*)
         end;
         //else just creating emptyDB
