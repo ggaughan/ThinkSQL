@@ -1,0 +1,1 @@
+select * from s left join sp using (sno)

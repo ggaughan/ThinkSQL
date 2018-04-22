@@ -1,0 +1,7 @@
+        303Lager                                             6                1.85
+        200Boiled Rice                                       3                1.95
+        101Spaghetti Bolognese                               2                1.95
+          2Samosas                                           1                1.95
+        301White Wine                                        7                2.10
+        300Red Wine                                          7                2.10
+

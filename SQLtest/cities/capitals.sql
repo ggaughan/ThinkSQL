@@ -1,0 +1,1 @@
+select * from cities where capital='Y'

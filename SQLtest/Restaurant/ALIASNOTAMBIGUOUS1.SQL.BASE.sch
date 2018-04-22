@@ -1,0 +1,7 @@
+[ALIASNOTAMBIGUOUS1.SQL.BASE]
+Filetype=Fixed
+CharSet=ascii
+Field1=MENU_ITEM_NAME,Char,40,00,00
+
+Field2=MENU_ITEM_NAME_1,Char,40,00,40
+

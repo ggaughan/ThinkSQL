@@ -1,0 +1,1 @@
+select a, coalesce(a,'?'),nullif(a,'X') from (values ('One'),(null),('Two'),('X')) as X(a)

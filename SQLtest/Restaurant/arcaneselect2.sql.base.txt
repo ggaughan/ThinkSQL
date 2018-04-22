@@ -1,0 +1,9 @@
+        100Lasagne                                           2                4.95
+        102Paella                                            2                6.95
+        103Borsch                                            2                4.95
+        105Kedgeree                                          2                4.99
+        106Boeuf Bourgignone                                 2                7.95
+        107Roast Beef and Yorkshire Pudding                  2                6.45
+        108Chicken Madras                                    2                5.45
+        109Chicken Tikka Masala                              2                5.95
+

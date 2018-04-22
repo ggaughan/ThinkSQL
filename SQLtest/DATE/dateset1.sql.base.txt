@@ -1,0 +1,5 @@
+P1    London         
+P2    Paris          
+P4    London         
+P6    London         
+

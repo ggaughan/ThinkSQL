@@ -1,0 +1,1 @@
+s left join sp on s.sno=sp.sno

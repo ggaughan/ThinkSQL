@@ -1,0 +1,1 @@
+(SELECT * FROM table_1) INTERSECT (SELECT * FROM table_2)
