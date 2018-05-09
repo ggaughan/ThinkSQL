@@ -5,8 +5,9 @@ program ThinkSQL;
                   See LICENCE.txt for details
 }
 {$I Defs.inc}
-{.$I Optional.use} // this include must be in the uses clause bellow. Adding and removing files from the project deletes it.
+{.$I Optional.use} // this include must be at the top of the uses clause bellow. Adding and removing files from the project deletes it.
 uses
+  {$I Optional.use}
   uPage in 'uPage.pas',
   uGlobal in 'uGlobal.pas',
   uDatabase in 'uDatabase.pas',

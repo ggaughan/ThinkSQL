@@ -85,8 +85,7 @@ begin
   {Point file list box at tests}
   if not setCurrentDir(dir) then
     showmessage('Failed setting directory')
-  else
-  begin
+  else begin
     flbTests.Directory:=dir;
     flbTests.Update;
     tLeft.databaseName:=flbTests.Directory;

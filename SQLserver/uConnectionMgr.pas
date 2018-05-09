@@ -444,7 +444,7 @@ begin
   except
     {$IFDEF INDY9}
     Connection.DisconnectSocket;
-//    Terminate; // a bit redundant? exit will take care of the the termination
+    Terminate; // a bit redundant? exit will take care of the the termination
     {$ENDIF}
     {$IFDEF INDY10}
     Connection.Disconnect;

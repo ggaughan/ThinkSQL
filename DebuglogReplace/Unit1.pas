@@ -8,8 +8,8 @@ uses
 
 type
   TForm1 = class(TForm)
-    AdvFileNameEdit1: TAdvFileNameEdit;
-    AeroSpeedButton1: TAeroSpeedButton;
+    AdvFileNameEdit1 :TAdvFileNameEdit;
+    AeroSpeedButton1 :TAeroSpeedButton;
     procedure AeroSpeedButton1Click(Sender: TObject);
   private
     { Private declarations }

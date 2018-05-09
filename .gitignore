@@ -5,3 +5,5 @@ __history
 *.identcache
 *.res
 /dcpcrypt2
+/SQLserver/bin
+/SQLserver/Lib
