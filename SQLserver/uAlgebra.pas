@@ -1,4 +1,4 @@
-unit uAlgebra;
+﻿unit uAlgebra;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -9,9 +9,9 @@ unit uAlgebra;
 
 //{$DEFINE DEBUGDETAIL}
 //{$DEFINE DEBUGDETAIL2}
-
+{$I Defs.inc}
 interface
-
+//JKOZ: no indy
 uses uSyntax, uRelation, uTuple {for canSeeCol result},uGlobal;
 
 const
@@ -126,7 +126,11 @@ var
 
 implementation
 
-uses uLog, sysUtils;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}
+  sysUtils;
 
 const
   where='uAlgebra';

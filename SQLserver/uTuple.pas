@@ -1,10 +1,11 @@
-unit uTuple;
+﻿unit uTuple;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
                   See LICENCE.txt for details
 }
-
+{$I Defs.inc}
+//{$IFDEF FPC}{$MODE DELPHI}{$ENDIF}
 {Tuple mapping onto file records for a particular relation
  Provides versioning during tuple-reads and updates
  Also used for system tuples, e.g. system catalog
@@ -59,9 +60,10 @@ unit uTuple;
 
 interface
 
-uses uFile, uPage, uStmt, uGlobalDef, uGlobal,
-uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures},
-uSyntax{for catalog.schema finding from node}
+uses
+  uFile, uPage, uStmt, uGlobalDef, uGlobal,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures},
+  uSyntax{for catalog.schema finding from node}
 ;
 
 const
@@ -333,9 +335,13 @@ var
 
 implementation
 
-uses uLog, sysUtils, uRelation, uServer, uTransaction,
-uAlgebra {for source node pointing}, uIterator, uHeapFile {for header updates}, Math {for power}, uIndexFile{for readToIndex},
-uVariableSet;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uRelation, uServer, uTransaction,
+  uAlgebra {for source node pointing}, uIterator, uHeapFile {for header updates}, Math {for power}, uIndexFile{for readToIndex},
+  uVariableSet;
 
 const
   where='uTuple';
@@ -8172,7 +8178,12 @@ begin
   //  - otherwise would need to handle insertions & re-jigging of existing offsets
 
   {Adjust the value for storage}
-  c:=d*power(10,fColDef[col].scale); //i.e. shift scale decimal places to the left
+  {$IFDEF CPU64}
+  {.$IFDEF FPC}
+  c:= trunc(d * power(10,fColDef[col].scale)); //i.e. shift scale decimal places to the left
+  {$ELSE}
+  c:= d * power(10,fColDef[col].scale); //i.e. shift scale decimal places to the left
+  {$ENDIF}
 
   {append the value to the end of the record}
   {point the colStart to this data}
@@ -9151,7 +9162,11 @@ begin
   //  - otherwise would need to handle insertions & re-jigging of existing offsets
 
   {Adjust the value for storage}
+  {$IFDEF CPU64}
+  c:=trunc(d*power(10,fColDef[col].scale)); //i.e. shift scale decimal places to the left
+  {$ELSE}
   c:=d*power(10,fColDef[col].scale); //i.e. shift scale decimal places to the left
+  {$ENDIF}
 
   {append the new value to the end of the update new data record}
   {point the colStart to this data}

@@ -209,7 +209,11 @@ var
 
 implementation
 
-uses uLog, sysUtils{for format}, uConstraint, uTransaction,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils{for format}, uConstraint, uTransaction,
      uProcessor{for unpreparePlan}, uIterator{for unpreparePlan}, uEvsHelpers;
 
 const
@@ -226,10 +230,12 @@ begin
 
   fowner:=tran;
   {$IFDEF SAFETY}
+{$IFDEF Debug_Log}
   if not assigned(owner) then
     log.add(who,where+routine,format('Owner must be set',[nil]),vAssertion); //todo remove!
   if not(owner is TTransaction) then
     log.add(who,where+routine,format('Owner must be a transaction',[nil]),vAssertion); //todo remove!
+{$ENDIF}    
   {$ENDIF}
 
   {Delphi does this for use, but good practice! (& less portability bugs)}
@@ -485,8 +491,10 @@ begin
   if CheckWt.tranId<fRt.tranId then
   begin
     {$IFDEF SAFETY}
+  {$IFDEF Debug_Log}
     if not assigned(owner) then
       log.add(who,where+routine,format('Owner not set',[nil]),vAssertion); //todo remove!
+  {$ENDIF}      
     {$ENDIF}
     if (isolationLevel=isReadUncommitted) and (CheckWt.tranId>=Ttransaction(owner).db.tranCommittedOffset) then
     begin //read any old garbage! Note: this was only added so primary-key constraints could work properly

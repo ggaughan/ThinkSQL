@@ -2,7 +2,7 @@ unit uEvsHelpers;
 
 interface
 uses
-  IdYarn, IdObjs, IdContext, IdTCPConnection, IdCustomTCPServer, IdStack, IdStackBSDBase, IdStackWindows, IdGlobal;
+  IdYarn, IdContext, IdTCPConnection, IdCustomTCPServer, IdStack, IdStackBSDBase, IdStackWindows, IdGlobal;
 
 type
   DWORD = LongWord;
@@ -19,7 +19,7 @@ type
     property OnExecute;
   end;
 
-  TIdPeerThread = class(TIdContext)
+  TIdPeerThread = class(TIdServerContext)
   private
     FTerminated :Boolean;
     FHandle     :THandle;
@@ -27,13 +27,13 @@ type
     function GetHandle: THandle;
     function GetThreadID: LongWord;
   public
-    constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil); override;
+    constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdContextThreadList = nil); override;
     destructor Destroy; override;
     procedure Terminate;
-    property Terminated :Boolean read FTerminated;// write FTerminated;
-    property Suspended  :Boolean read GetSuspended;
-    Property Handle : THandle read GetHandle;
-    property ThreadID:LongWord read GetThreadID;
+    property Terminated :Boolean  read FTerminated;// write FTerminated;
+    property Suspended  :Boolean  read GetSuspended;
+    Property Handle     :THandle  read GetHandle;
+    property ThreadID   :LongWord read GetThreadID;
   end;
 
   TTcpConnectionHelper = class Helper for TIDTcpConnection
@@ -51,12 +51,14 @@ type
     property ClosedGraceFully:Boolean read GetClosedGraceFully;
   end;
 
+  { TTCPServerHelper }
+
   TTCPServerHelper = class helper for TIdCustomTCPServer
   private
-    function GetThreadClass: TIdContextClass;
-    procedure SetThreadClass(const aValue: TIdContextClass);
+    function GetThreadClass: TIdServerContextClass;
+    procedure SetThreadClass(const aValue: TIdServerContextClass);
   public
-    property ThreadClass : TIdContextClass read GetThreadClass write SetThreadClass;
+    property ThreadClass : TIdServerContextClass read GetThreadClass write SetThreadClass;
   end;
 
   TStackHelper = class Helper for TIDStack
@@ -99,7 +101,7 @@ end;
 
 procedure TTcpConnectionHelper.ReadBuffer(var aBuffer; const aBufferSize: Integer; aNow:Boolean = False);
 var
-  vBuf :TBytes;
+  vBuf :TIdBytes;
 begin
   SetLength(vBuf,aBufferSize);
   IOHandler.ReadBytes(vBuf, aBufferSize, False);
@@ -126,18 +128,18 @@ begin
   IOHandler.WriteLn(aText);
 end;
 
-constructor TIdPeerThread.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList);
+constructor TIdPeerThread.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdContextThreadList);
 begin
   inherited;
   FHandle := 0;
 end;
 
-function TTCPServerHelper.GetThreadClass: TIdContextClass;
+function TTCPServerHelper.GetThreadClass: TIdServerContextClass;
 begin
   Result := Self.ContextClass;
 end;
 
-procedure TTCPServerHelper.SetThreadClass(const aValue: TIdContextClass);
+procedure TTCPServerHelper.SetThreadClass(const aValue :TIdServerContextClass);
 begin
   Self.ContextClass := aValue;
 end;

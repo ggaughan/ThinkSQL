@@ -1,4 +1,4 @@
-unit uBuffer;
+﻿unit uBuffer;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -8,6 +8,7 @@ unit uBuffer;
 {$DEFINE SAFETY}
 //{$DEFINE DEBUGDETAIL} //debug pin and unpin activity
 //{$DEFINE DEBUGDETAIL2} //debug flushpage & reaper fail activity - use for buffer allocation tuning
+{.$DEFINE DEBUG_Log} //JKOZ: for debug purposes only if the debug_log must be defined do it from the
 
 {$DEFINE LIMIT_HASH_PROBE} //limit probe for 1st empty slot to within MaxProbe
                            //MaxProbe=0 -> force reaper to try to use exact hash slot (unless pinned)
@@ -31,8 +32,9 @@ Note: if, in future, we try to avoid writes back to disk by removing rolled-back
        Added FframeCS to safeguard access to frame array, else with heavy use on large
        files would occasionally get invalid pages = disaster!
 }
-
+{$I Defs.inc} //Various defines for global enabling/disabling portions.
 interface
+//JKOZ: no indy
 
 uses uGlobal, uPage, uDatabase, uStmt,  SyncObjs {for Critcal Sections};
 
@@ -66,7 +68,9 @@ type
       function unpin:integer;
 
       {debug}
-      procedure Status(slot:integer);
+    {$IFDEF Debug_Log}
+      procedure Status(slot:integer); //JKOZ: No real code only logging and only when debug_log is defined
+    {$ENDIF}
   end; {TFrame}
 
   TBufMgr=class
@@ -97,12 +101,18 @@ type
       function resetAllFrames(db:TDB):integer;                   //frame-level total reset for a db
 
       {debug}
+    {$IFDEF Debug_Log}
       procedure Status;
+    {$ENDIF}
     end; {TBufMgr}
 
 implementation
 
-uses uLog, sysUtils, uTransaction, uOS;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}
+  sysUtils, uTransaction, uOS;
 
 const
   where='uBuffer';
@@ -155,29 +165,26 @@ end;
 
 
 {debug}
+{$IFDEF Debug_Log}
 procedure TFrame.Status(slot:integer);
 begin
+//{$IFDEF Debug_Log}
   if id=InvalidPageId then
-    {$IFDEF DEBUG_LOG}
     log.add(who,where,format(' %4d: db=%10.10s, id=%5d, pincount=%2d, dirty=%1d, lru=%4d, dbswap=%6d, hit=%d',[slot,'?',id,pincount,ord(page.dirty),flruCount,fdbThrashCount,fhitcount]),vdebug)
-    {$ENDIF}
   else
-    {$IFDEF DEBUG_LOG}
     log.add(who,where,format(' %4d: db=%10.10s, id=%5d, pincount=%2d, dirty=%1d, lru=%4d, dbswap=%6d, hit=%d',[slot,fdb.dbname,id,pincount,ord(page.dirty),flruCount,fdbThrashCount,fhitcount]),vdebug)
-    {$ELSE}
-    ;
-    {$ENDIF}
+//{$ENDIF}
 end;
+{$ENDIF}
 
 
-{TBufMgr}
+{$REGION ' TBufMgr '}
 
 constructor TBufMgr.Create;
 var
   i:integer;
 begin
-  for i:=0 to MaxFrames-1 do
-  begin
+  for i:=0 to MaxFrames-1 do begin
     fFrame[i]:=TFrame.Create;
     fFrame[i].id:=InvalidPageId;
     fFrame[i].fPinCount:=0;
@@ -194,8 +201,7 @@ destructor TBufMgr.Destroy;
 var
   i:integer;
 begin
-  for i:=MaxFrames-1 downto 0 do
-  begin
+  for i:=MaxFrames-1 downto 0 do begin
     //todo assertions?
     fFrame[i].Free;
   end;
@@ -278,14 +284,11 @@ begin
                           //note: room for improvement?
       {$ENDIF}
 
-      if res>=MaxFrames then
-      begin
+      if res>=MaxFrames then begin
         res:=InvalidPageId;
         retry:=-1;
-        while (res=InvalidPageId) and ((retry>0) or (retry=-1)) do //outer loop to retry in case reaper can't find space
-        begin
-          if retry>0 then
-          begin
+        while (res=InvalidPageId) and ((retry>0) or (retry=-1)) do begin//outer loop to retry in case reaper can't find space
+          if retry>0 then begin
             dec(retry); //i.e. once retry fired, no more to avoid infinite loop
             {$IFDEF DEBUG_LOG}
             log.add(st.who,where+routine,format('Retrying (%d more tries to go)',[retry]),vDebugMedium);
@@ -293,8 +296,7 @@ begin
           end;
 
           res:=Reaper(st,id); //note:reaper now uses critical section & leaves the found page pinned so it's protected for us
-          if res=InvalidPageId then
-          begin
+          if res=InvalidPageId then begin
             {$IFDEF DEBUG_LOG}
             log.add(st.who,where+routine,'No more suitable frames free - Reaper unable to help.. will wait & retry',vdebugError);
             {$ENDIF}
@@ -317,8 +319,7 @@ begin
           {$ENDIF}
         end; {retry}
 
-        if (res=InvalidPageId) then
-        begin
+        if (res=InvalidPageId) then begin
           if (retry=0) then
             {$IFDEF DEBUG_LOG}
             log.add(st.who,where+routine,format('Failed after retries',[nil]),vAssertion);
@@ -334,9 +335,7 @@ begin
           //note: set page:=nil?
           exit; //abort
         end;
-      end
-      else
-      begin
+      end else begin
         res:=(hash+res) MOD MaxFrames;
         {Ensure this frame slot is not used by another thread by tacking it
         }
@@ -360,8 +359,7 @@ begin
          and get others to latch/unlatch when they pin it so they queue if its not ready
          (otherwise we risk them reading garbage)}
         result:=fFrame[freeFrame].page.latch(st);
-        if result=ok then
-        begin
+        if result=ok then begin
           try
             //complete the frame
             {This will make the page visible to other pinners, i.e. so they don't try to put the same
@@ -375,17 +373,14 @@ begin
             FframeCS.Leave; //Note: it makes sense anyway since our search stability is no longer needed because we've pinned our page/frame & latch it to queue any others
             csLeft:=True; //track CS early leave
 
-            if Ttransaction(st.owner).db.readPage(id,fFrame[freeFrame].page)=ok then
-            begin
+            if Ttransaction(st.owner).db.readPage(id,fFrame[freeFrame].page)=ok then begin
               //pin the frame
               //note: 03/01/03 no need to pin above/in reaper if we move this before CS leave...?
               fFrame[freeFrame].pin;   //todo assert result of pin=0!?
               fFrame[freeFrame].flruCount:=1;
               inc(fFrame[freeFrame].fhitCount);
               p:=fFrame[freeFrame].page; //return the now buffered page
-            end
-            else
-            begin
+            end else begin
               {This could happen if torn page flags were not in sync. (check result code)
                if so, we should tell the user to restore from backup/fix the problem
                - fix could be to mark this page as bad & skip it
@@ -903,35 +898,37 @@ begin
   end; {try}
 end; {resetAllFrames}
 
-
 {Debug}
-procedure TBufMgr.Status;
+{$IFDEF Debug_Log}
+procedure TBufMgr.Status; //JKOZ: No real code only loging and only when debug_log is Ddfined
 var
   i:integer;
 begin
    //todo protect with FframeCS?
-  {$IFDEF DEBUG_LOG}
+//  {$IFDEF DEBUG_LOG}
   log.add(who,where,'  Buffer manager status: ',vdebug);
-  {$ENDIF}
+//  {$ENDIF}
   for i:=0 to MaxFrames-1 do  //todo only display up to highest used frame
   begin
-    fFrame[i].Status(i);
+    fFrame[i].Status(i); //JKOZ no real code only loging.
   end;
-  {$IFDEF DEBUG_LOG}
+//  {$IFDEF DEBUG_LOG}
   log.add(who,where,format('  Buffer reaper hand           : %d',[reaperHand]),vdebug);
   log.add(who,where,format('  Buffer manager misses        : %d',[debugBufferMiss]),vdebug);
   log.add(who,where,format('  Buffer manager hits          : %d',[debugBufferHit]),vdebug);
-  {$ENDIF}
+//  {$ENDIF}
   if debugBufferMiss<>0 then
-    {$IFDEF DEBUG_LOG}
+//    {$IFDEF DEBUG_LOG}
     log.add(who,where,format('  Buffer manager hit-miss ratio: %f:%d',[(debugBufferHit/debugBufferMiss),1]),vdebug);
-    {$ELSE}
-    ;
-    {$ENDIF}
-  {$IFDEF DEBUG_LOG}
+//    {$ELSE}
+//    ;
+//    {$ENDIF}
+//  {$IFDEF DEBUG_LOG}
   log.add(who,where,format('  Buffer manager flushes       : %d',[debugBufferFlush]),vdebug);
-  {$ENDIF}
+//  {$ENDIF}
 end;
+{$ENDIF}
 
+{$ENDREGION}
 
 end.

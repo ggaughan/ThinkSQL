@@ -14,7 +14,11 @@ function CatalogBackup(st:Tstmt;connection:TIdTCPConnection;targetName:string):i
 
 implementation
 
-uses uLog,SysUtils,uServer,uDatabase,uTransaction,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils,uServer,uDatabase,uTransaction,
      uRelation, uFile, uHeapFile, uHashIndexFile, uPage,
      uOS, uGlobalDef, classes{for TList}, uParser,
      uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
@@ -1012,7 +1016,9 @@ begin
             log.add(targetTran.sysStmt.who,where+routine,'Opened new target database',vDebug);
             {$ENDIF}
             targetDB.status; //debug report
+          {$IFDEF Debug_Log}
             (targetDB.owner as TDBserver).buffer.status;
+          {$ENDIF}            
 
             result:=copySystemTables(st,connection,targetTran,targetDB);
             if result<>ok then
@@ -1101,7 +1107,9 @@ begin
             log.add(targetTran.sysStmt.who,where+routine,'Re-opened new target database',vDebug);
             {$ENDIF}
             targetDB.status; //debug report
+          {$IFDEF Debug_Log}
             (targetDB.owner as TDBserver).buffer.status;
+          {$ENDIF}            
 
             result:=copyTables(st,connection,targetTran,targetDB);
             if result<>ok then

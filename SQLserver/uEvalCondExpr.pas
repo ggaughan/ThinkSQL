@@ -1,4 +1,4 @@
-unit uEvalCondExpr;
+﻿unit uEvalCondExpr;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -53,7 +53,11 @@ function CompleteSelectItem(st:Tstmt;iter:TIterator;snode:TSyntaxNodePtr;aggrega
 
 implementation
 
-uses ulog, sysUtils, uAlgebra, uOptimiser, uProcessor, uIterGroup {for aggregate finalisation access to groupRowCount},
+uses
+{$IFDEF Debug_Log}
+  ulog,
+{$ENDIF}  
+  sysUtils, uAlgebra, uOptimiser, uProcessor, uIterGroup {for aggregate finalisation access to groupRowCount},
  uRelation {for access to tuple's owner attribute for privilege checking},
  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
  ,uOS {for getSystemUser (was Windows & so had to prefix maxSMALLINT with uGlobal)}

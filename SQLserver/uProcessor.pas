@@ -75,17 +75,21 @@ function UnPreparePlan(stmt:Tstmt):integer;
 
 implementation
 
-uses uLog, SysUtils, uRelation, uServer,
- uOptimiser, uCondToCNF, uParser {for ExecSQL}, uDatabase {for create catalog},
- uIterStmt,
- uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
- uHashIndexFile, uConstraint, IdTCPServer {for connection handle via tr.thread},
- uRoutine, uVariableSet, uEvalCondExpr, uIterInto{for dynamic fetch},
- uDatabaseMaint, uPage{debug only}
- ,uConnectionMgr{for access to TCMthread for shutdown check},
- uGarbage
- ,uEvsHelpers
- ;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils, uRelation, uServer,
+  uOptimiser, uCondToCNF, uParser {for ExecSQL}, uDatabase {for create catalog},
+  uIterStmt,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
+  uHashIndexFile, uConstraint, IdTCPServer {for connection handle via tr.thread},
+  uRoutine, uVariableSet, uEvalCondExpr, uIterInto{for dynamic fetch},
+  uDatabaseMaint, uPage{debug only}
+  ,uConnectionMgr{for access to TCMthread for shutdown check},
+  uGarbage
+  ,uEvsHelpers
+  ;
 
 const
   where='uProcessor';
@@ -8991,7 +8995,9 @@ begin
         log.add(st.who,where,'',vDebug);
         {$ENDIF}
         Ttransaction(st.owner).db.status; //debug report
+      {$IFDEF Debug_Log}
         (Ttransaction(st.owner).db.owner as TDBserver).buffer.status;
+      {$ENDIF}        
         {Now add the information_schema}
         if Ttransaction(st.owner).db.createInformationSchema<>ok then
         begin

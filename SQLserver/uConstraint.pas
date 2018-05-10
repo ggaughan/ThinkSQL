@@ -1,4 +1,4 @@
-unit uConstraint;
+﻿unit uConstraint;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -184,7 +184,11 @@ var
 
 implementation
 
-uses uLog, uTransaction, uTuple, sysUtils, uRelation,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  uTransaction, uTuple, sysUtils, uRelation,
      //next are needed to build and process check-plans
      uAlgebra, uIterator, uParser, uOptimiser, uProcessor,
      uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
@@ -890,9 +894,11 @@ var
   res:string;
   res_null:boolean;
 
+{$IFDEF Debug_Log}
   {$IFNDEF DEBUGDETAIL3}
   saveLogVerbosity:vbType;
   {$ENDIF}
+{$ENDIF}  
 
   FKchildCol,FKparentCol:TconstraintColumn;
 

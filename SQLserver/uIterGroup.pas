@@ -1,4 +1,4 @@
-unit uIterGroup;
+﻿unit uIterGroup;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -61,7 +61,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uEvalCondExpr, uIterProject{for SetProjectHeadings}, uMarshalGlobal, uIterSort;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uEvalCondExpr, uIterProject{for SetProjectHeadings}, uMarshalGlobal, uIterSort;
 
 const
   where='uIterGroup';

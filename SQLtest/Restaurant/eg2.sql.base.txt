@@ -1,0 +1,23 @@
+Soup of the Day                                         2.45IN BETWEEN
+Samosas                                                 1.95IN BETWEEN
+Prawn Cocktail                                          2.95IN BETWEEN
+Lasagne                                                 4.95IN BETWEEN
+Spaghetti Bolognese                                     1.95IN BETWEEN
+Paella                                                  6.95IN BETWEEN
+Borsch                                                  4.95IN BETWEEN
+Irish stew                                              3.95IN BETWEEN
+Kedgeree                                                4.99IN BETWEEN
+Boeuf Bourgignone                                       7.95MOST      
+Roast Beef and Yorkshire Pudding                        6.45IN BETWEEN
+Chicken Madras                                          5.45IN BETWEEN
+Chicken Tikka Masala                                    5.95IN BETWEEN
+Boiled Rice                                             1.95IN BETWEEN
+Mashed Potato                                           1.45IN BETWEEN
+Red Wine                                                2.10IN BETWEEN
+White Wine                                              2.10IN BETWEEN
+Guinness                                                2.99IN BETWEEN
+Lager                                                   1.85IN BETWEEN
+Lemonade                                                1.20LEAST     
+Cola                                                    1.20LEAST     
+Ice Cream                                               2.99IN BETWEEN
+

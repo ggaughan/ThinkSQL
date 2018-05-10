@@ -1,4 +1,4 @@
-unit uIterMaterialise;
+﻿unit uIterMaterialise;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -52,7 +52,12 @@ const
 
 implementation
 
-uses uLog, sysUtils, uTuple;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+
+  sysUtils, uTuple;
 
 const
   where='uIterMaterialise';

@@ -1,4 +1,4 @@
-unit uIterJoinMerge;
+﻿unit uIterJoinMerge;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -55,7 +55,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uEvalCondExpr, uIterRelation {for equi-join filter test/assertion}, uMarshalGlobal,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uEvalCondExpr, uIterRelation {for equi-join filter test/assertion}, uMarshalGlobal,
      uIterSort{for child assertion};
 
 const

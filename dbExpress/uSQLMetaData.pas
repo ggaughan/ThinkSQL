@@ -1,12 +1,13 @@
-{$IFNDEF DBEXP_STATIC}
+﻿{$IFNDEF DBEXP_STATIC}
 unit uSQLMetaData;
-
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
                   See LICENCE.txt for details
 }
 
 interface
+
+{ TODO : Convert the dbxpress drivers to dbxpress 4 of delphi 2007 }
 
 uses uSQLConnection,
      DBXpress;
@@ -15,6 +16,7 @@ uses uSQLConnection,
 {$IFNDEF DBEXP_IMPLEMENTATION}
 type
   TSQLMetaData=class(TInterfacedObject,ISQLMetaData)
+//  TSQLMetaData=class(TInterfacedObject,TSQLMetaData)
   private
     SQLConnection:TxSQLConnection;
     SQLConnectionRef:ISQLConnection; //purely used to keep ref. count in order

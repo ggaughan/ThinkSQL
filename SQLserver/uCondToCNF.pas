@@ -11,7 +11,7 @@ unit uCondToCNF;
  The routine accepts a syntax tree node and will modify the tree as required
 }
 
-interface
+interface//JKOZ : Indy Clean;
 
 uses uSyntax;
 
@@ -19,11 +19,17 @@ function CondToCNF(srootAlloc:TSyntaxNodePtr;var snode:TSyntaxNodePtr):integer;
 
 implementation
 
-uses uGlobal, uLog, SysUtils;
+uses uGlobal,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils;
 
+{$IFDEF Debug_Log}
 const
   where='uCondToCNF';
   who='';
+{$ENDIF}  
 
 function PushORs(srootAlloc:TSyntaxNodePtr;snode:TSyntaxNodePtr):integer;
 {Pushes OR nodes down into AND nodes
@@ -35,7 +41,9 @@ function PushORs(srootAlloc:TSyntaxNodePtr;snode:TSyntaxNodePtr):integer;
  Assumes:
    AND and OR always have two sub-trees
 }
+{$IFDEF Debug_Log}
 const routine=':PushORs';
+{$ENDIF}
 var
   stemp:TSyntaxNodePtr;
 begin

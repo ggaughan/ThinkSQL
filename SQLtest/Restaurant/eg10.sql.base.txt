@@ -1,0 +1,4 @@
+        200Boiled Rice                                       3                1.95
+        304Lemonade                                          5                1.20
+        305Cola                                              5                1.20
+

@@ -1,4 +1,4 @@
-unit uIterator;
+﻿unit uIterator;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -92,7 +92,11 @@ var
 
 implementation
 
-uses uLog, sysUtils, uGlobal,
+uses
+{$IFDEF Debug_Log}
+uLog,
+{$ENDIF}
+  sysUtils, uGlobal,
      {for tree display}
       uIterDelete,
       uIterGroup,

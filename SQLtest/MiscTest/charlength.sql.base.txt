@@ -1,0 +1,7 @@
+TRAILING SPACES                              18.00               15.00
+   LEADING SPACES                            17.00               14.00
+   BOTH SPACES                               17.00               11.00
+lower case                                   10.00               10.00
+UPPER CASE                                   10.00               10.00
+NOSPACES                                      8.00                8.00
+

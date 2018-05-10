@@ -5,7 +5,7 @@ program ThinkSQL;
                   See LICENCE.txt for details
 }
 {$I Defs.inc}
-{.$I Optional.use} // this include must be in the uses clause bellow. Adding and removing files from the project deletes it.
+{.$I Optional.use} // this include must be at the top of the uses clause bellow. Adding and removing files from the project deletes it.
 uses
   {$I Optional.use}
   uPage in 'uPage.pas',
@@ -59,7 +59,8 @@ uses
   uDatabaseMaint in 'uDatabaseMaint.pas',
   uMarshalGlobal in '..\Odbc\uMarshalGlobal.pas',
   uMarshal in '..\Odbc\uMarshal.pas',
-  uEvsHelpers in 'uEvsHelpers.pas';
+  uEvsHelpers in 'uEvsHelpers.pas',
+  uThinkSQLAPI in '..\Evosi\uThinkSQLAPI.pas';
 
 {$IFDEF WIN32}
 {$R *.RES}
@@ -67,7 +68,7 @@ uses
 {$ENDIF}
 
 begin
-  {$IFDEF WIN32}
+  {$IFDEF WINDOWNS}
   {$IFDEF USE_APPLICATION}
     Application.Initialize; //note: only needed for OLE automation?
     Application.Title := 'ThinkSQL';

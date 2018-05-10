@@ -1,4 +1,4 @@
-unit uIterProject;
+﻿unit uIterProject;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -37,10 +37,14 @@ function SetProjectHeadings(st:Tstmt;anode:TAlgebraNodePtr;snode:TSyntaxNodePtr;
 
 implementation
 
-uses uLog, sysUtils, uEvalCondExpr, uProcessor {for checkTableColumnPrivilege},
-     uRelation, {for checkTableColumnPrivilege}
-     uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
-     ;
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}
+  sysUtils, uEvalCondExpr, uProcessor {for checkTableColumnPrivilege},
+  uRelation, {for checkTableColumnPrivilege}
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}
+  ;
 
 const
   where='uIterProject';

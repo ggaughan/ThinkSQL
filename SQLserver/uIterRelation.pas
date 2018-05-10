@@ -1,4 +1,4 @@
-unit uIterRelation;
+﻿unit uIterRelation;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -48,7 +48,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uEvalCondExpr, uMarshalGlobal;
+uses
+{$IFDEF Debug_Log}
+uLog,
+{$ENDIF}
+sysUtils, uEvalCondExpr, uMarshalGlobal;
 
 const
   where='uIterRelation';

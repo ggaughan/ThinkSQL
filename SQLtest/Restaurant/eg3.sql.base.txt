@@ -1,0 +1,23 @@
+Soup of the Day                                         2.45MEDIUM
+Samosas                                                 1.95LOW   
+Prawn Cocktail                                          2.95MEDIUM
+Lasagne                                                 4.95MEDIUM
+Spaghetti Bolognese                                     1.95LOW   
+Paella                                                  6.95HIGH  
+Borsch                                                  4.95MEDIUM
+Irish stew                                              3.95MEDIUM
+Kedgeree                                                4.99MEDIUM
+Boeuf Bourgignone                                       7.95HIGH  
+Roast Beef and Yorkshire Pudding                        6.45HIGH  
+Chicken Madras                                          5.45MEDIUM
+Chicken Tikka Masala                                    5.95MEDIUM
+Boiled Rice                                             1.95LOW   
+Mashed Potato                                           1.45LOW   
+Red Wine                                                2.10MEDIUM
+White Wine                                              2.10MEDIUM
+Guinness                                                2.99MEDIUM
+Lager                                                   1.85LOW   
+Lemonade                                                1.20LOW   
+Cola                                                    1.20LOW   
+Ice Cream                                               2.99MEDIUM
+

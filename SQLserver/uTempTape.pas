@@ -1,4 +1,4 @@
-unit uTempTape;
+﻿unit uTempTape;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -84,7 +84,11 @@ var
 
 implementation
 
-uses uGlobal, sysUtils,uLog;
+uses uGlobal, sysUtils
+{$IFDEF Debug_Log}
+  ,uLog
+{$ENDIF}  
+  ;
 
 const where='uTempTape';
       who=''; //todo remove

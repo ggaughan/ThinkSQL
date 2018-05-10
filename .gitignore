@@ -1,3 +1,15 @@
 *.dcu
 __history
 *.local
+/DebuglogReplace/*.exe
+*.identcache
+*.res
+/dcpcrypt2
+/SQLserver/bin
+/SQLserver/Lib
+*.lps
+ConverterBackup
+backup
+/SQLtools/TestSuite/*.exe
+*.dproj
+bin

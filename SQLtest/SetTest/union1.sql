@@ -1,0 +1,1 @@
+(SELECT * FROM table_1) UNION (SELECT * FROM table_2)

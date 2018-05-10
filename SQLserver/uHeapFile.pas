@@ -74,7 +74,10 @@ const
 implementation
 
 uses
-  uLog, sysUtils, uServer, uTransaction
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uServer, uTransaction
   ,uEvsHelpers;
 
 const

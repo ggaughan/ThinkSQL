@@ -19,14 +19,14 @@
 //  {$DEFINE INDY8}       //use old Indy: problem with shutdown - extra thread restarts/stop forever!
 //{$ENDIF}
 
-interface
+interface   //JKOZ: Indy clean;
 
 uses uGlobal, uServer, uTransaction, uMarshal, uStmt, SyncObjs{for TEvent},
-     IdBaseComponent, IdComponent, IdTCPServer, IdThread, IdObjs, IdTCPConnection, IdYarn,
+     IdBaseComponent, IdComponent, IdTCPServer, IdThread, IdTCPConnection, IdYarn,
      uGlobalDef{for Tblob}
    {$IFDEF INDY10}
      ,IdContext
-   {$ENDIF}     
+   {$ENDIF}
      ,uEvsHelpers;
 
 type
@@ -62,9 +62,9 @@ type
 
     function getIP:string;
   protected
-    {$IFDEF INDY10}
-    function Run:Boolean; override;
-    {$ENDIF}
+
+    function Run{$IFDEF INDY10}:Boolean;{$ENDIF} override;
+
   public
     dbserver:TDBserver;    //- in future could have multiple servers per process?
 
@@ -82,7 +82,7 @@ type
     property IP:string read getIP;
 
      {$IFDEF INDY9}  constructor Create(ACreateSuspended:Boolean); override; {$endif}
-     {$IFDEF INdY10} constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil); override; {$endif}
+     {$IFDEF INdY10} constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdContextThreadList = nil); override; {$endif}
     destructor Destroy; override;
     {$IFDEF INDY9}
     procedure Run;override;
@@ -91,7 +91,11 @@ type
 
 implementation
 
-uses sysUtils, ulog, uParser,
+uses sysUtils,
+{$IFDEF Debug_Log}
+  ulog,
+{$ENDIF}  
+  uParser,
      {$IFDEF WIN32} //move to uOS
      Windows{for thread timing},
      {$ENDIF}
@@ -182,7 +186,7 @@ var
   checkPort:integer;
 begin
   result:=Fail;
-  ss.ThreadClass:=TCMthread;
+  ss.ThreadClass := TCMThread;
 
   //todo: use thread pooling
 
@@ -284,7 +288,7 @@ begin
 end;
 
 {$IFDEF INDY10}
-constructor TCMthread.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil);
+constructor TCMthread.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdContextThreadList = nil);
 {$endif}
 {$IFDEF INDY9}
 constructor TCMthread.Create(ACreateSuspended:Boolean);
@@ -380,12 +384,7 @@ begin
     result:='';
 end; {getIP}
 
-{$IFDEF INDY9}
-procedure TCMthread.Run;
-{$ENDIF}
-{$IFDEF INDY10}
-function TCMthread.Run:Boolean;
-{$ENDIF}
+function TCMthread.Run{$IFDEF INDY10}:Boolean{$ENDIF};
 const routine=':Run';
 type
   dumbMode=(dmNormal,dmCreate,dmBlock);

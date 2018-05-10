@@ -1,4 +1,4 @@
-unit uOS;
+﻿unit uOS;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -8,11 +8,11 @@ unit uOS;
 {Operating system specific routines
  - this is an attempt to keep all the nasty but necessary IFDEFs out of the way
 }
-
+{$I Defs.inc}
 interface
 
 uses uStmt
-{$IFDEF WIN32}
+{$IFDEF WINDOWS}
   ,Windows;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -20,7 +20,7 @@ uses uStmt
 {$ENDIF}
 
 const
-{$IFDEF WIN32}
+{$IFDEF WINDOWS}
   INFINITY = INFINITE;
 {$ENDIF}
 

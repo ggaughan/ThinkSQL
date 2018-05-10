@@ -1,0 +1,1 @@
+values( octet_length(X'FF0000AABBCC000000') )

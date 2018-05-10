@@ -22,10 +22,14 @@
 
 interface
 
-uses uLog,sysUtils, uTransaction, uStmt, uServer, uSyntax, uProcessor, uIterator,
-     uGlobal, Math{for power in lex install_num}, SyncObjs,
-     IdTCPConnection,
-     uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}  {todo: put in implementation section!}
+uses
+{$IFDEF Debug_log}
+  uLog,
+{$ENDIF}
+  sysUtils, uTransaction, uStmt, uServer, uSyntax, uProcessor, uIterator,
+  uGlobal, Math{for power in lex install_num}, SyncObjs,
+  IdTCPConnection,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants}  {todo: put in implementation section!}
 ;
 
 function ExecSQL(st:TStmt;{const }sql:string;connection:TIdTCPConnection;var resultRowCount:integer):integer;
@@ -44,6 +48,11 @@ implementation
 uses
   uEvsHelpers
   ,lexlib,yacclib;//moved here from sql.pas because d2007 deadlocks it self.
+
+{$IFDEF FPC}
+type
+  Ptr = Pointer;
+{$ENDIF}
 
 {$INCLUDE SQL}        //this includes the yacc/lex parser engine
                       //built from sqllex.l and sql.y

@@ -1,4 +1,4 @@
-unit uIterDelete;
+﻿unit uIterDelete;
 
 {       ThinkSQL Relational Database Management System
               Copyright © 2000-2012  Greg Gaughan
@@ -29,7 +29,11 @@ type
 
 implementation
 
-uses uLog, sysUtils, uGlobal, uGlobalDef, uProcessor,
+uses
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  sysUtils, uGlobal, uGlobalDef, uProcessor,
      uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for se* error constants},
      uConstraint
 ;

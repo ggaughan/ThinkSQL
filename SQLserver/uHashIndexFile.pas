@@ -126,7 +126,10 @@ type
 implementation
 
 uses
-  uLog, SysUtils, Math {for power}, uServer, uTransaction,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}  
+  SysUtils, Math {for power}, uServer, uTransaction,
   uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures}
   ,uEvsHelpers;
 
@@ -877,6 +880,23 @@ begin
          todo: use assembly to control the loop and key-character access...
          Note: downside = less portable (but simple to port!)
         }
+        {$IFDEF CPU64}
+        //todo remove once assembly code is working...
+        try
+          {$IFDEF FPC}
+          {$Push}
+          {$ENDIF}
+          {$OverflowChecks off}
+          Result := Result + (Result shl 5) + integer(p^); //hash * 33 + c
+          {$IFDEF FPC}
+          {$Pop}
+          {$ELSE}
+
+          {$ENDIF}
+        except //todo: maybe we need $Q+ to be able to trap this correctly?
+          ;//continue, even if we have overflow...
+        end;
+        {$ELSE}
         asm //result:=result + (result shl 5) + p^; //hash * 33 + c
           MOV EAX,result
           MOV ECX,result
@@ -886,13 +906,7 @@ begin
           ADD EAX,ECX
           MOV @result,EAX
         end; {asm}
-      (*todo remove once assembly code is working...
-        try
-          result:=result + (result shl 5) + p^; //hash * 33 + c
-        except //todo: maybe we need $Q+ to be able to trap this correctly?
-          //continue, even if we have overflow...
-        end;
-      *)
+        {$ENDIF}
         inc(p);
       end;
   end;

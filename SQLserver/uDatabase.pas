@@ -26,8 +26,8 @@
 interface
 
 uses
-  uGlobal, SyncObjs {for Critcal Sections}, sysutils, classes {for TBits}, IdTCPConnection{debug only}, uStmt
-  ,uEvsHelpers;
+  uGlobal, SyncObjs, sysutils, classes, IdTCPConnection, uStmt,
+  uEvsHelpers;
 
 type
   TdbHeader=record //db header page data layout
@@ -218,11 +218,16 @@ var
 
 implementation
 
-uses uBuffer, uLog, uServer, uRelation, uTuple,
-     uFile, uParser, uGlobalDef, uPage, uTransaction, uProcessor,
-     uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures},
-     uGarbage {for detachAnyTransactions (disconnection)}, uOS{for sleepOS}
-     ;
+uses
+  uBuffer,
+{$IFDEF Debug_Log}
+  uLog,
+{$ENDIF}
+  uServer, uRelation, uTuple,
+  uFile, uParser, uGlobalDef, uPage, uTransaction, uProcessor,
+  uMarshalGlobal {in '..\Odbc\uMarshalGlobal.pas'} {for date/time structures},
+  uGarbage {for detachAnyTransactions (disconnection)}, uOS{for sleepOS}
+  ;
 
 const
   where='uDatabase';
@@ -336,7 +341,9 @@ begin
 
     with (owner as TDBserver) do
     begin
+    {$IFDEF Debug_Log}
       buffer.status; //show the status now that the GC has definitely finished
+    {$ENDIF}      
 
       buffer.flushAllPages(tr.sysStmt);
     //todo check result of flushAll- if fail, force all to be flushed, even if pinned (better than bug->corruption?)
@@ -1406,10 +1413,12 @@ begin
 
 
           {Insert rows into sysTran}
+        {$IFDEF Debug_Log}
           with (owner as TDBserver) do
           begin
             buffer.status;
           end;
+        {$ENDIF}          
           result:=PrepareSQL(tr.sysStmt,nil,
             'INSERT INTO sysTran VALUES (1,''N''); ' );
           if result=ok then result:=ExecutePlan(tr.sysStmt,rc );
@@ -1429,10 +1438,12 @@ begin
             {$ELSE}
             ;
             {$ENDIF}
+        {$IFDEF Debug_Log}
           with (owner as TDBserver) do
           begin
             buffer.status;
           end;
+        {$ENDIF}          
   //*)
         end;
         //else just creating emptyDB
@@ -4966,7 +4977,7 @@ var
   page:TPage;   //new page ref
 begin
   result:=Fail; //assume fail
-  assignFile(diskfile,name+DB_FILE_EXTENSION);
+  AssignFile(diskfile,name+DB_FILE_EXTENSION);
   try
     diskfileCS.Enter;
     try
@@ -5063,8 +5074,8 @@ begin
         // but, would this ensure that we have a consistent db?
           buffer.resetAllFrames(self);
         end;
-
-        system.closeFile(diskfile);
+        //system.CloseFile(diskfile);
+        {$IFDEF FPC}system.Close(diskfile){$ELSE}system.CloseFile(diskfile);{$ENDIF}
       end; {try}
     finally
       diskfileCS.Leave;
@@ -5128,7 +5139,7 @@ begin
   try
     diskfileCS.Enter;
     try
-      system.closeFile(diskFile);
+      {$IFDEF FPC} system.close(diskFile); {$ELSE} system.closeFile(diskFile); {$ENDIF}
     finally
       diskfileCS.Leave;
     end; {try}
