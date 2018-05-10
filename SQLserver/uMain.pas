@@ -42,7 +42,7 @@ uses
 {$ENDIF}
   uServer, uGlobal, uConnectionMgr,
   uOS,
-  {$IFDEF WIN32} //todo move to uOS
+  {$IFDEF WINDOWS} //todo move to uOS
   Windows,{for getWorkingsetSize}
   {$IFDEF USE_APPLICATION}
   Forms, //for Application
@@ -63,8 +63,8 @@ uses
   uRoutine{for debug count};
 
 const
-  where='uMain';
-  who='';
+  where = 'uMain';
+  who   = '';
 
 var
   OnIdle : TIdleEvent;

@@ -26,8 +26,8 @@
 interface
 
 uses
-  uGlobal, SyncObjs {for Critcal Sections}, sysutils, classes {for TBits}, IdTCPConnection{debug only}, uStmt
-  ,uEvsHelpers;
+  uGlobal, SyncObjs, sysutils, classes, IdTCPConnection, uStmt,
+  uEvsHelpers;
 
 type
   TdbHeader=record //db header page data layout
@@ -4977,7 +4977,7 @@ var
   page:TPage;   //new page ref
 begin
   result:=Fail; //assume fail
-  assignFile(diskfile,name+DB_FILE_EXTENSION);
+  AssignFile(diskfile,name+DB_FILE_EXTENSION);
   try
     diskfileCS.Enter;
     try
@@ -5074,8 +5074,8 @@ begin
         // but, would this ensure that we have a consistent db?
           buffer.resetAllFrames(self);
         end;
-
-        system.closeFile(diskfile);
+        //system.CloseFile(diskfile);
+        {$IFDEF FPC}system.Close(diskfile){$ELSE}system.CloseFile(diskfile);{$ENDIF}
       end; {try}
     finally
       diskfileCS.Leave;
@@ -5139,7 +5139,7 @@ begin
   try
     diskfileCS.Enter;
     try
-      system.closeFile(diskFile);
+      {$IFDEF FPC} system.close(diskFile); {$ELSE} system.closeFile(diskFile); {$ENDIF}
     finally
       diskfileCS.Leave;
     end; {try}

@@ -49,6 +49,11 @@ uses
   uEvsHelpers
   ,lexlib,yacclib;//moved here from sql.pas because d2007 deadlocks it self.
 
+{$IFDEF FPC}
+type
+  Ptr = Pointer;
+{$ENDIF}
+
 {$INCLUDE SQL}        //this includes the yacc/lex parser engine
                       //built from sqllex.l and sql.y
 

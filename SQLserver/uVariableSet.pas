@@ -16,7 +16,7 @@
        In the future, we might need to revert back to using the TTuple if more complex
        parameter passing is needed (e.g. arrays/rows).
 }
-
+{$I Defs.inc}
 {$DEFINE SAFETY}  //use assertions
                   //Note: Should be no reason to disable these, except maybe small speed increase & small size reduction
                   //      Disabling them would cause more severe crashes (access violations) if an assertion fails
@@ -759,7 +759,11 @@ begin
     d:=-1{=null!} //todo remove - save time - only when safe!
   else
   begin
+    {$IFDEF CPU64}
+    c:=trunc(fvarData[v].numVal);
+    {$ELSE}
     c:=fvarData[v].numVal;
+    {$ENDIF}
 
     {Adjust the scale}
     d:=c/power(10,fvarDef[v].scale); //i.e. shift scale decimal places to the right
@@ -1183,7 +1187,11 @@ begin
   result:=Fail;
 
   {Adjust the value for storage}
+  {$IFDEF CPU64}
+  c:=Trunc(d*power(10,fvarDef[v].scale)); //i.e. shift scale decimal places to the left
+  {$ELSE}
   c:=d*power(10,fvarDef[v].scale); //i.e. shift scale decimal places to the left
+  {$ENDIF}
 
   fvarData[v].nullVal:=null;
   if not null then

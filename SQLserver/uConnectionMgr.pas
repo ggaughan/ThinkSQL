@@ -22,7 +22,7 @@
 interface   //JKOZ: Indy clean;
 
 uses uGlobal, uServer, uTransaction, uMarshal, uStmt, SyncObjs{for TEvent},
-     IdBaseComponent, IdComponent, IdTCPServer, IdThread, IdObjs, IdTCPConnection, IdYarn,
+     IdBaseComponent, IdComponent, IdTCPServer, IdThread, IdTCPConnection, IdYarn,
      uGlobalDef{for Tblob}
    {$IFDEF INDY10}
      ,IdContext
@@ -82,7 +82,7 @@ type
     property IP:string read getIP;
 
      {$IFDEF INDY9}  constructor Create(ACreateSuspended:Boolean); override; {$endif}
-     {$IFDEF INdY10} constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil); override; {$endif}
+     {$IFDEF INdY10} constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdContextThreadList = nil); override; {$endif}
     destructor Destroy; override;
     {$IFDEF INDY9}
     procedure Run;override;
@@ -186,7 +186,7 @@ var
   checkPort:integer;
 begin
   result:=Fail;
-  ss.ThreadClass:=TCMthread;
+  ss.ThreadClass := TCMThread;
 
   //todo: use thread pooling
 
@@ -288,7 +288,7 @@ begin
 end;
 
 {$IFDEF INDY10}
-constructor TCMthread.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdThreadList = nil);
+constructor TCMthread.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TIdContextThreadList = nil);
 {$endif}
 {$IFDEF INDY9}
 constructor TCMthread.Create(ACreateSuspended:Boolean);
