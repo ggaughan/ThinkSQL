@@ -67,7 +67,7 @@ uses
 {.$ENDIF}
 
 begin
-  {$IFDEF WIN32}
+  {$IFDEF WINDOWS}
   {$IFDEF USE_APPLICATION}
     Application.Initialize; //note: only needed for OLE automation?
     Application.Title := 'ThinkSQL';

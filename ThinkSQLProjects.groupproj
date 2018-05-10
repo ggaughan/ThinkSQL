@@ -1,0 +1,74 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{09e7d242-9e2c-4eee-81e9-1779be9064bb}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="dbExpress\sqlthink.dproj" />
+    <Projects Include="dcpcrypt2\DCPdelphi2007.dproj" />
+    <Projects Include="SQLserver\ThinkSQL.dproj" />
+    <Projects Include="SQLtools\TestSuite\TestSuite.dproj" />
+    <Projects Include="ThinkSQLService\ThinkSQLService.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="ThinkSQL">
+    <MSBuild Projects="SQLserver\ThinkSQL.dproj" Targets="" />
+  </Target>
+  <Target Name="ThinkSQL:Clean">
+    <MSBuild Projects="SQLserver\ThinkSQL.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ThinkSQL:Make">
+    <MSBuild Projects="SQLserver\ThinkSQL.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ThinkSQLService">
+    <MSBuild Projects="ThinkSQLService\ThinkSQLService.dproj" Targets="" />
+  </Target>
+  <Target Name="ThinkSQLService:Clean">
+    <MSBuild Projects="ThinkSQLService\ThinkSQLService.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ThinkSQLService:Make">
+    <MSBuild Projects="ThinkSQLService\ThinkSQLService.dproj" Targets="Make" />
+  </Target>
+  <Target Name="DCPdelphi2007">
+    <MSBuild Projects="dcpcrypt2\DCPdelphi2007.dproj" Targets="" />
+  </Target>
+  <Target Name="DCPdelphi2007:Clean">
+    <MSBuild Projects="dcpcrypt2\DCPdelphi2007.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="DCPdelphi2007:Make">
+    <MSBuild Projects="dcpcrypt2\DCPdelphi2007.dproj" Targets="Make" />
+  </Target>
+  <Target Name="sqlthink">
+    <MSBuild Projects="dbExpress\sqlthink.dproj" Targets="" />
+  </Target>
+  <Target Name="sqlthink:Clean">
+    <MSBuild Projects="dbExpress\sqlthink.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="sqlthink:Make">
+    <MSBuild Projects="dbExpress\sqlthink.dproj" Targets="Make" />
+  </Target>
+  <Target Name="TestSuite">
+    <MSBuild Projects="SQLtools\TestSuite\TestSuite.dproj" Targets="" />
+  </Target>
+  <Target Name="TestSuite:Clean">
+    <MSBuild Projects="SQLtools\TestSuite\TestSuite.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="TestSuite:Make">
+    <MSBuild Projects="SQLtools\TestSuite\TestSuite.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="ThinkSQL;ThinkSQLService;DCPdelphi2007;sqlthink;TestSuite" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="ThinkSQL:Clean;ThinkSQLService:Clean;DCPdelphi2007:Clean;sqlthink:Clean;TestSuite:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="ThinkSQL:Make;ThinkSQLService:Make;DCPdelphi2007:Make;sqlthink:Make;TestSuite:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

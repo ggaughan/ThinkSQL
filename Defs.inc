@@ -1,7 +1,9 @@
 //{$DEFINE NO_GARBAGE_COLLECTOR}    //debug
                                     //Note: Garbage Collect Catalog is still available anyway!
+{$IFDEF FPC}{$MODE DELPHI}{$ENDIF}
+{$IFDEF Win32} {$Define WINDOWS} {$ENDIF}
 
-{$IFDEF WIN32}
+{$IFDEF WINDOWS}
   {.$DEFINE USE_APPLICATION} //Windows application.processMessages to prevent other apps. hanging (also in DPR)
   {$IFNDEF USE_APPLICATION}
     {$DEFINE USE_PROCESS_MESSAGES} //Non-Forms Windows message handler
@@ -30,4 +32,5 @@
   {$Define D6up}
   {$IFEnd}
 {$ENDIF}
+
 

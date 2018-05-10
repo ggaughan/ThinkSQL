@@ -18,7 +18,7 @@
     </General>
     <BuildModes Count="4">
       <Item1 Name="Default" Default="True"/>
-      <Item2 Name="Debug">
+      <Item2 Name="32bit Debug">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -62,7 +62,7 @@
           </Other>
         </CompilerOptions>
       </Item2>
-      <Item3 Name="Release">
+      <Item3 Name="32bit Release">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -100,10 +100,13 @@
           </Other>
         </CompilerOptions>
       </Item3>
-      <Item4 Name="64bit">
+      <Item4 Name="64bit Debug">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="bin\$(TargetCPU)-$(TargetOS)\"/>
+          </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);..;..\odbc"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
